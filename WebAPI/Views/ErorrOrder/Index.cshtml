@@ -1,0 +1,303 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="~/Content/layui/css/layui.css" rel="stylesheet" media="all" />
+    <link href="~/Content/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/userCss/erorrOrder.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="containers">
+        <div class="right-float">
+            <div class="header_right">
+                <a href="#">
+                    <span class="text">身份待审核列表</span>
+                </a>
+            </div>
+            <div class="left_Table" id="left_Table">
+                <div class="demoTable" style="width:100%;height:48px;background:#1F79AD;">
+
+                    &nbsp; &nbsp;订单号：
+                    <div class="layui-inline" style="height:40px;margin-top:8px;">
+                        <input class="layui-input" name="transportId" style="height:30px;">
+                    </div>
+                    客户姓名：
+                    <div class="layui-inline" style="height:40px;margin-top:8px;">
+                        <input class="layui-input" name="clientName" style="height:30px;">
+                    </div>
+                    后勤姓名：
+                    <div class="layui-inline" style="height:40px;margin-top:8px;">
+                        <input class="layui-input" name="recipientsName" style="height:30px;">
+                    </div>
+                    申请国家：
+                    <div class="layui-inline" style="height:40px;margin-top:8px;">
+                        <input class="layui-input" name="country" style="height:30px;">
+                    </div>
+                    &nbsp; &nbsp;<button class="layui-btn" onclick="search();"><i class="layui-icon">&#xe615;</i>搜索</button>
+                </div>
+                <table class="layui-table" lay-data="{ height:'full-70', url:'/DTService/ErorrOrder/GetOrderInfo', page:true, id:'idTest'}" lay-filter="demo">
+                    <thead>
+                        <tr>
+                            <th lay-data="{field:'transportId',fixed: 'left', width:200,align:'center',}">订单号</th>
+                            <th lay-data="{field:'clientName', width:90,align:'center',}">客户姓名</th>
+                            <th lay-data="{field:'recipientsName', width:90,align:'center',}">后勤姓名</th>
+                            <th lay-data="{field:'erorrData', width:378,align:'center',edit: 'text',templet:'#erorrData',}">订单分析状况</th>
+                            <th lay-data="{field:'visaInfoCountry', width:90,align:'center',}">申请国家</th>
+                            <th lay-data="{field:'visaInfoNum', width:110,align:'center',}">申请数量(本)</th>
+                            <th lay-data="{field:'orderStatus', width:90,templet: '#orderStatus',align:'center',}">订单状态</th>
+                            <th lay-data="{fixed: 'right', width:170, align:'center',toolbar: '#barDemo',align:'center',}">订单可选操作</th>
+
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="row pre-scrollable" id="list_Container" style="max-height:92%;width:300px;margin-left:0;">
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/Content/resources/js/jquery-1.12.2.min.js"></script>
+    <script src="~/Content/layui/layui.js" charset="utf-8"></script>
+    <script src="~/Content/userCss/dateTime.js"></script>
+    <script type="text/html" id="orderStatus">
+        {{#  if(d.orderStatus === '结束'){ }}
+        进行中
+        {{#  } else { }}
+        {{ d.orderStatus }}
+        {{#  } }}
+    </script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">详情</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">保存评价</a>
+    </script>
+    <script id="erorrData" type="text/html">
+        {{#  if(d.erorrData != null &&d.erorrData !="正常"){ }}
+        <div style="color: #fff;background:red;width:100%;height:100%;">{{ d.erorrData }}</div>
+        {{#  } else if(d.erorrData == null) { }}
+        <div style="color: #fff;background:#5BC1DF;width:100%;height:100%;">订单未结束</div>
+        {{#  } else { }}
+        <div style="color: #fff;background:#5BC1DF;width:100%;height:100%;">{{ d.erorrData }}</div>
+        {{#  } }}
+    </script>
+    <script type="text/javascript">
+        var timer;
+        var formData = {};
+        var layer, table;
+        $(function () {
+            LoadData();
+            layui.use(['table'], function () {
+                table = layui.table;
+                table.on('tool(demo)', function (obj) {
+                    var data = obj.data;
+                    if (obj.event === 'detail') {
+                        layui.use(['layer'], function () {
+                            var layer = layui.layer, $ = layui.$;
+                            layer.open({
+                                type: 1,//类型
+                                area: ['500px', '600px'],//定义宽和高
+                                title: '详情信息',//题目
+                                shadeClose: false,//点击遮罩层关闭
+                                content: '<div class="layui-row">' +
+                                               '<div class="layui-col-md12" style="padding: 5px">' +
+                                                    '<ul id="flows" class="flow-default">' +
+                                                     '<blockquote class="layui-elem-quote">客户姓名：' + data.clientName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >客户电环：' + data.clientTlp + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">后勤姓名：' + data.recipientsName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">后勤电话：' + data.recipientsTlp + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >客户位置：' + data.sendPosition + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">后勤位置：' + data.recivePosition + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">订单号：' + data.transportId + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">商品名称：' + data.visaInfoCountry + "签证" + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">商品本书：' + data.visaInfoNum + "本" + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >客户下单时间：' + ConvertDataTime(data.creatOrderTime) + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">后勤接单时间：' + ConvertDataTime(data.receiveOrderTime) + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">订单当前状态：' + data.orderStatus + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >推荐行程距离：' + data.recommendedDistance + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">推荐行程所用时间：' + data.recommendedTime + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >实际行程距离：' + data.reallyDistance + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">实际行程所用时间：' + data.orderReallyTime + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">接单限制时间：' + data.timeLimit + "小时内" + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >推荐收件时间：' + data.discription + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >收件时间：' + ConvertDataTime(data.orderCompleteTime) + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >订单分析状况：' + ConvertErorrData(data.erorrData) + '</blockquote>' +
+                                                    '</ul>' +
+                                                '</div>' +
+                                           ' </div>'
+                            });
+                        })
+
+                    } else if (obj.event === 'edit') {
+                        //更新分析
+                        UpErorrData(data.transportId, data.erorrData);
+                    }
+
+                });
+            });
+        })
+        function ConvertErorrData(str) {
+            if (str == "" || str == null) {
+                return "订单未结束";
+            } else {
+                return str;
+            }
+        }
+        function search() {
+            var transportId = $("input[name='transportId']").val();
+            var clientName = $("input[name='clientName']").val();
+            var recipientsName = $("input[name='recipientsName']").val();
+            var country = $("input[name='country']").val();
+            formData["transportId"] = transportId;
+            formData["clientName"] = clientName;
+            formData["recipientsName"] = recipientsName;
+            formData["country"] = country;
+            table.reload("idTest", {
+                where: { data: JSON.stringify(formData) }
+            });
+            LineHight();
+        }
+        function UpErorrData(transportId, erorrData) {
+            $.ajax({
+                url: '/DTService/ErorrOrder/UpErorrData',
+                type: 'GET',
+                async: true,
+                data: { transportId: transportId, erorrData: erorrData },
+                success: function (json) {
+                    //更新表格数据
+                    var data = JSON.parse(json);
+                    if (data.scu) {
+                        var transportId = $("input[name='transportId']").val();
+                        var clientName = $("input[name='clientName']").val();
+                        var recipientsName = $("input[name='recipientsName']").val();
+                        var country = $("input[name='country']").val();
+                        formData["transportId"] = transportId;
+                        formData["clientName"] = clientName;
+                        formData["recipientsName"] = recipientsName;
+                        formData["country"] = country;
+                        table.reload("idTest", {
+                            where: { data: JSON.stringify(formData) }
+                        });
+                        layer.msg('更新订单成功！');
+                    }
+                },
+                fail: function (json) {
+                    layer.msg('网络出错！');
+                }
+            });
+        }
+        function LoadData() {
+            $.ajax({
+                url: '/DTService/ErorrOrder/GetAction',
+                type: 'GET',
+                async: true,
+                data: {},
+                success: function (json) {
+                    if (json != "") {
+                        var dataJson = JSON.parse(json);
+                        var list_Container = $("#list_Container");
+                        var str = "", type, address, where;
+                        for (var i = 0; i < dataJson.length; i++) {
+                            switch (dataJson[i].userType) {
+                                case "1":
+                                    type = "销售";
+                                    break;
+                                case "2":
+                                    type = "客户";
+                                    break;
+                            }
+                            address = dataJson[i].addressName == null ? "未上传" : dataJson[i].addressName
+                            str += '<div class="ActionList"><div class="ActionList-left">' +
+                                ' <div class="ActionList-left-in">微信名称：' + dataJson[i].userNikeName + '</div>' +
+                                 ' <div class="ActionList-left-in">真实姓名：' + dataJson[i].userName + '</div>' +
+                                  ' <div class="ActionList-left-in">联系电话：' + dataJson[i].userTlp + '</div>' +
+                                   ' <div class="ActionList-left-in">联系地址：' + address + '</div>' +
+                                   ' <div class="ActionList-left-in">申请类型：' + type + '</div></div>' +
+                                '<div class="ActionList-right"><div class="ActionList-right-in"><button class="btn-sm btn btn-danger" data-id=' + dataJson[i].userId + ' onclick="CareAction(this);">忽略</button></div>' +
+                                 ' <div class="ActionList-right-in"><button class="btn-sm btn btn-info" data-id=' + dataJson[i].userId + ' onclick="UpAction(this);">通过</button></div></div></div>';
+                        }
+                        list_Container.html(str);
+                    } else {
+                        return;
+                    }
+                },
+                fail: function (json) {
+                    layer.msg('网络出错！');
+                }
+            });
+        }
+        function UpAction(e) {
+            var userId = e.dataset.id;
+            $.ajax({
+                url: '/DTService/ErorrOrder/UpAction',
+                type: 'GET',
+                async: true,
+                data: { userId: userId, type: "yes" },
+                success: function (json) {
+                    var data = JSON.parse(json);
+                    if (data.scu) {
+                        layer.msg('成功！');
+                        $("#list_Container").html('');
+                        LoadData()
+                    }
+                },
+                fail: function (json) {
+                    layer.msg('网络出错！');
+                }
+            });
+        }
+        function CareAction(e) {
+            var userId = e.dataset.id;
+            $.ajax({
+                url: '/DTService/ErorrOrder/UpAction',
+                type: 'GET',
+                async: true,
+                data: { userId: userId, type: "no" },
+                success: function (json) {
+                    var data = JSON.parse(json);
+                    if (data.scu) {
+                        layer.msg('成功！');
+                        $("#list_Container").html('');
+                        LoadData();
+                    }
+                },
+                fail: function (json) {
+                    layer.msg('网络出错！');
+                }
+            });
+        }
+        /*function LineHight() {
+            LayUIDataTable.SetJqueryObj($);// 第一步：设置jQuery对象
+            var currentRowDataList = LayUIDataTable.ParseDataTable();
+            console.log(currentRowDataList)
+            // 对相关数据进行判断处理--此处对【竞猜数量】大于30的进行高亮显示
+            $.each(currentRowDataList, function (index, obj) {
+                if (obj['erorrData'] && obj['erorrData'].value == "无异常订单") {
+                    obj['erorrData'].row.css("background-color", "#FAB000");
+                }
+            })
+        }*/
+
+        function ConvertDataTime(str) {
+            if (str==""||str==null) {
+                return "请持续关注订单状况";
+            }
+            var date = new Date();
+            date.setTime(str.replace("/Date(", "").replace(")/", ""));
+            return date.Format("yyyy-MM-dd hh:mm:ss")
+        }
+    </script>
+</body>
+
+</html>

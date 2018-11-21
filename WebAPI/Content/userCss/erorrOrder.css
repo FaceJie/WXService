@@ -1,0 +1,119 @@
+﻿html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    list-style: none;
+}
+
+.containers {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.left_Table{
+    position:absolute;
+    width: 80%;
+    height: 100%;
+    left:0;
+    top:0;
+}
+.right-float {
+    width: 20%;
+    height: 100%;
+    float: right;
+}
+
+.right-float-title {
+    width: 100%;
+    height: 7%;
+    background: #ccc;
+    border: 1px solid #c0c0c0;
+    border-radius: 3px;
+}
+
+.ActionList {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-content: center;
+    height: 120px;
+    width: 100%;
+    background: #1F79AD;
+    margin-bottom: 5px;
+    opacity: 0.7;
+    border: 1px solid #c0c0c0;
+    border-radius: 10px;
+}
+
+    .ActionList:nth-child(1) {
+        margin-top: 5px;
+    }
+
+.ActionList-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-content: center;
+    height: 100%;
+    width: 70%;
+}
+
+.ActionList-left-in {
+    height: 20%;
+    width: 100%;
+    font-size: 13px;
+    color: #fff;
+}
+
+.ActionList-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-content: center;
+    height: 100%;
+    width: 20%;
+}
+
+.ActionList-right-in {
+    height: 28%;
+    width: 100%;
+    font-size: 13px;
+    color: #fff;
+}
+
+    .ActionList-right-in button {
+        width: 100%;
+    }
+
+/*头部右边样式*/
+.header_right {
+    width: 116px;
+    height: 48px;
+}
+
+    .header_right a {
+        width: 300px;
+        height: 48px;
+        line-height: 48px;
+        text-align: center;
+        text-decoration: none;
+        color: #383838;
+        border: 1px solid #1F79AD;
+        margin-top: 0;
+        font-size: 15px;
+        border-radius: 2px;
+    }
+
+        .header_right a:hover {
+            text-decoration: none;
+        }
+
+        .header_right a:nth-child(1) {
+            float: left;
+            background: #1F79AD; /*渐变处理*/
+            color: #fff;
+            border: 1px solid #1F79AD;
+        }
+/*头部布局完成*/

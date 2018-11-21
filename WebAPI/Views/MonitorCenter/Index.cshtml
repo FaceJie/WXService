@@ -1,0 +1,717 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>运单列表</title>
+    <link href="~/Content/userCss/map.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+</head>
+
+<body>
+    <div id="outer-box">
+        <div id="panel">
+            <div class="header_right">
+                <a href="#">
+                    <span class="text">订单监控中心</span>
+                </a>
+            </div>
+            <ul id="accordion" class="accordion" style="max-width:300px;margin-left:0;">
+                <li>
+                    <div class="link" data-index="1"><i class="fa fa-paint-brush"></i>待接单<i class="fa fa-chevron-down"></i></div>
+                    <ul class="submenu" id="list_first"></ul>
+                </li>
+                <li>
+                    <div class="link" data-index="2"><i class="fa fa-code"></i>待处理<i class="fa fa-chevron-down"></i></div>
+                    <ul class="submenu" id="list_second"></ul>
+                </li>
+                <li>
+                    <div class="link" data-index="3"><i class="fa fa-mobile"></i>已完成<i class="fa fa-chevron-down"></i></div>
+                    <ul class="submenu" id="list_third"></ul>
+                </li>
+            </ul>
+            <div class="header_right">
+                <a href="#">
+                    <span class="text">订单派送安排</span>
+                </a>
+            </div>
+            <div class="orderList" style="width:300px;height:auto;margin-top:4px;">
+                <div class="row pre-scrollable" id="list_Container" style="max-height:360px;width:300px;margin-left:0;">
+                    <ul class="list-group" id="OrderCheckList"></ul>
+                    <div class="header_right" style="width:280px !important;">
+                        <button type="button" id="upOrderData" class="btn btn-primary active" style="width:99%;height:100%;background:#fff;margin:0 auto;color:#000;" onclick="SendOrderList();">派送此订单</button>
+                    </div>
+                </div>
+            </div>
+            <div class="header_right" style="position: fixed;left:0;bottom:55px;">
+                <a href="https://www.iot-esta.com/ErorrOrder/Index">
+                    <span class="text">订单异常处理及审核</span>
+                </a>
+            </div>
+            <div class="header_right" style="position: fixed;left:0;bottom:5px;">
+                <a href="https://www.iot-esta.com/FilesUp/Index">
+                    <span class="text">上传签证资料</span>
+                </a>
+            </div>
+        </div>
+        <div id="eventInfo">停留展示信息</div>
+        <div id="container"></div>
+    </div>
+    <section id="mask" class="mask">
+        <div class="mask_in">
+            <!--关闭-->
+            <a href="#" class="close-btn" id="close_btn" onclick="closeMask();"></a>
+
+            <!--内容-->
+            <div class="mask_content">
+                <div class="mask_header">
+                    <div class="mask_header_title">
+                        <span></span>
+                        <span class="txt">确认派送当前订单</span>
+                        <span></span>
+                    </div>
+                    <form action="" method="post" class="mail-login">
+                        <div class="mail-login-in">
+                            <div class="sendUserInfo" id="sendUserInfo"></div>
+                            <div class="reciveOrderInfo row pre-scrollable" style="max-height:240px;height:220px;" id="reciveOrderInfo">
+
+
+                            </div>
+                        </div>
+                        <a href="#" onclick="CompleteOrderData();" class="btn btn18 r_btn"><span class="text"> 确认</span></a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src='//webapi.amap.com/maps?v=1.4.10&key=d4cc26f84605e28a992a736913ca2b53'></script>
+
+    <!-- UI组件库 1.0 -->
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <script type="text/javascript">
+        var waitOrder = [],
+            optionOrder = [],
+            completeOrder = [],
+            clickIndex = 1,
+            mapContainerId = "list_first",
+            mapDatas = {},
+            mapData = [],
+            map,
+            markerList,
+            creat_time,
+            now_time,
+            hour,
+            //发送订单相关
+            logics = { "userId": "", "userName": "", "position": "" },
+            order = [];
+        //后勤的随机颜色，选择要求，不影响查看客户资料的位置
+        $(function () {
+            //先获取服务器数据，减轻请求压力
+            map = new AMap.Map('container', {
+                zoom: 9
+            });
+            LoadData();
+            //实例化Accrod
+            var Accordion = function (el, multiple) {
+                this.el = el || {};
+                this.multiple = multiple || false;
+                // 获取li
+                var links = this.el.find('.link');
+                // Evento
+                links.on('click', { el: this.el, multiple: this.multiple }, this.dropdown)
+            }
+            //下拉列表事件定义
+            Accordion.prototype.dropdown = function (e) {
+                var $el = e.data.el;
+                $this = $(this),
+                  $next = $this.next();
+                //$next.slideToggle();
+                //$this.parent().toggleClass('open');
+                clickIndex = e.target.dataset.index;
+                if (!e.data.multiple) {
+                    //$el.find('.submenu').not($next).slideUp().parent().removeClass('open');
+                };
+                switch (clickIndex) {
+                    case "1":
+                        mapContainerId = "list_first";
+                        mapData = [];
+                        for (var i = 0; i < mapDatas.waitOrder.length; i++) {
+                            mapData = mapDatas.waitOrder;
+                        }
+                        break;
+                    case "2":
+                        mapContainerId = "list_second";
+                        mapData = [];
+                        for (var i = 0; i < mapDatas.optionOrder.length; i++) {
+                            mapData = mapDatas.optionOrder;
+                        }
+                        break;
+                    case "3":
+                        mapContainerId = "list_third";
+                        mapData = [];
+                        for (var i = 0; i < mapDatas.completeOrder.length; i++) {
+                            mapData = mapDatas.completeOrder;
+                        }
+                        break;
+                }
+                clearData();
+                CreateMap(mapContainerId, mapData);
+            }
+            //创建手风琴列表
+            var accordion = new Accordion($('#accordion'), false);
+        });
+        function clearData() {
+            if (markerList != null && markerList.getData().length > 0) {
+                markerList.clearData();
+            }
+        }
+        //隐藏mask
+        function closeMask() {
+            $("#mask").css("display", "none");
+            logics = { "userId": "", "userName": "", "position": "" },
+            order = [];
+            $('#sendUserInfo').html('');//先清空
+            $('#reciveOrderInfo').html('');
+
+        }
+        //发送订单
+        function CompleteOrderData() {
+            var orderDatas = "";
+            for (var i = 0; i < order.length; i++) {
+                orderDatas += order[i].orderId + ",";
+            }
+            $.ajax({
+                url: '/DTService/MonitorCenter/CompleteOrderData',
+                type: 'GET',
+                async: false,
+                data: {
+                    logicsId: logics.userId,
+                    orderDatas: orderDatas,
+                },
+                success: function (json) {
+                    var dataJson = JSON.parse(json);
+                    if (dataJson.scu) {
+                        $("#mask").css("display", "none");
+                        $('#sendUserInfo').html('');//先清空
+                        $('#reciveOrderInfo').html('');
+                        $('#OrderCheckList').html('');
+                        alert("订单派送成功！")
+                        //刷新页面
+                        LoadData();
+                        clearData();
+                        CreateMap("list_first", mapDatas.waitOrder);
+                    } else {
+                        $("#mask").css("display", "none");
+                        $('#sendUserInfo').html('');//先清空
+                        $('#reciveOrderInfo').html('');
+                        $('#OrderCheckList').html('');
+                        alert("下单失败！")
+                        //刷新页面
+                        LoadData();
+                        clearData();
+                        CreateMap("list_first", mapDatas.waitOrder);
+                    }
+
+                },
+                fail: function (json) {
+                    console.log(json)
+                }
+            });
+        }
+        function SendOrderList() {
+            //遍历创建的订单，并检查订单是否合理，只能一个后勤，订单被选中
+            var count;
+            count = $('#OrderCheckList li').length;
+            if (count > 0) {
+                var i = 0, j = 0;
+                var isScu = $('#OrderCheckList li').each(function (index, el) {
+                    if ($(this).attr('data-type') == '2') {
+                        i++
+                    } else {
+                        j++
+                    }
+                    return i;
+                });
+                if (!(i == 1 && j > 0)) {
+                    alert("当前共有" + i + "个后勤接单人员，操作" + j + "笔订单，操作不合理，请检查订单数据！")
+                    return;
+                }
+                $("#mask").css("display", "block");
+                $('#OrderCheckList li').each(function (index, el) {
+                    if ($(this).attr('data-type') == '1') {
+                        var obj = { "orderId": $(this).attr('data-id'), "orderName": $(this).attr('data-username'), "position": $(this).attr('data-position'), "desc": $(this).attr('data-desc').split("*")[0] };
+                        order.push(obj);
+
+                    } else {
+                        logics.userId = $(this).attr('data-id');
+                        logics.userName = $(this).attr('data-username');
+                        logics.position = $(this).attr('data-position');
+                    }
+                });
+                //列表组装完后，把信息加载到对应元素
+                $('#sendUserInfo').html('');//先清空
+                $('#sendUserInfo').html('<div class="list-title" style="margin:5px;">' + logics.userName + '</div>');
+                $('#reciveOrderInfo').html('');
+                var chlidList = "";
+                if (order.length > 0) {
+
+                    for (var i = 0; i < order.length; i++) {
+                        chlidList += '<li class="list-group-item" style="width:100%;height:30px;font-size:15px;padding:5px;"><span class="badge">' + order[i].desc + '</span>' + order[i].orderName + '</li>';
+                    }
+                }
+                $('#reciveOrderInfo').html('<ul class="list-group">' + chlidList + '</ul>');
+            } else {
+                alert("请选择派单人及其订单！")
+                return;
+            }
+
+        }
+        //同步加载数据
+        function LoadData(clickIndex) {
+            waitOrder = [],
+            optionOrder = [],
+            completeOrder = [],
+            mapDatas = {},
+            mapData = [],
+            $.ajax({
+                url: '/DTService/MonitorCenter/GetAllOrderLocationData',
+                type: 'GET',
+                async: false,
+                data: {},
+                success: function (json) {
+                    if (json == "") {
+                        alert("当前系统没有订单！")
+                        return
+                    }
+                    var dataJson = JSON.parse(json);
+                    if (dataJson.length > 0) {
+                        for (var i = 0; i < dataJson.length; i++) {
+                            switch (dataJson[i].orderStatus) {
+                                case "待接单":
+                                    //debugger
+                                    //var color = "#6495ED", className = "my-svg-marker",statusDesc="";
+                                    //var creat_time = new Date(parseInt(dataJson[i].creatOrderTime.replace("/Date(", "").replace(")/", ""), 10)).getTime();
+                                    //var now_time = new Date().getTime();
+                                    //var hour = Math.floor((now_time - creat_time) / 1000 / 60 / 60);
+                                    //if (hour > parseInt(dataJson[i].timeLimit)) {
+                                    //    已经过期了
+                                    //    color = "#2F4F4F";
+                                    //    className = "my-svg-marker-flash"
+                                    //    statusDesc = "(过期)";
+                                    //}
+                                    //if (parseInt(dataJson[i].timeLimit)-hour < 2) {
+                                    //    2小时类急待处理的订单
+                                    //    color = "#DC143C";
+                                    //    className = "my-svg-marker-flash"
+                                    //    statusDesc = "(急件)";
+                                    //}
+                                    debugger
+                                    var waitOrderDetail = {
+                                        "id": dataJson[i].orderId,
+                                        "userName": dataJson[i].sName,
+                                        "transportId": dataJson[i].transportId,
+                                        "position": [dataJson[i].sPositionSet.split(",")[0], dataJson[i].sPositionSet.split(",")[1]],
+                                        "itemColor": "#FFA500",
+                                        "className": "my-svg-marker",
+                                        "circle": {},
+                                        "type": "1",
+                                        "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
+                                        "orderStatus": dataJson[i].orderStatus,
+                                        "desc": dataJson[i].sAddress + "*" + dataJson[i].rAddress
+                                    };
+                                    waitOrder.push(waitOrderDetail);
+                                    break;
+                                case "待处理":
+                                    var optionOrderDetail = {
+                                        "id": dataJson[i].orderId,
+                                        "userName": dataJson[i].sName,
+                                        "transportId": dataJson[i].transportId,
+                                        "position": [dataJson[i].sPositionSet.split(",")[0], dataJson[i].sPositionSet.split(",")[1]],
+                                        "itemColor": "#FFA500",
+                                        "className": "my-svg-marker",
+                                        "circle": {},
+                                        "type": "1",
+                                        "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
+                                        "orderStatus": dataJson[i].orderStatus,
+                                        "desc": dataJson[i].sAddress + "*" + dataJson[i].rAddress
+                                    };
+                                    optionOrder.push(optionOrderDetail);
+                                    break;
+                                case "结束":
+                                    var optionOrderDetail = {
+                                        "id": dataJson[i].orderId,
+                                        "userName": dataJson[i].sName,
+                                        "transportId": dataJson[i].transportId,
+                                        "position": [dataJson[i].sPositionSet.split(",")[0], dataJson[i].sPositionSet.split(",")[1]],
+                                        "itemColor": "#FFA500",
+                                        "className": "my-svg-marker",
+                                        "circle": {},
+                                        "type": "1",
+                                        "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
+                                        "orderStatus": dataJson[i].orderStatus,
+                                        "desc": dataJson[i].sAddress + "*" + dataJson[i].rAddress
+                                    };
+                                    optionOrder.push(optionOrderDetail);
+                                    break;
+                                case "待收货":
+                                    var optionOrderDetail = {
+                                        "id": dataJson[i].orderId,
+                                        "userName": dataJson[i].sName,
+                                        "transportId": dataJson[i].transportId,
+                                        "position": [dataJson[i].sPositionSet.split(",")[0], dataJson[i].sPositionSet.split(",")[1]],
+                                        "itemColor": "#FFA500",
+                                        "className": "my-svg-marker",
+                                        "circle": {},
+                                        "type": "1",
+                                        "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
+                                        "orderStatus": dataJson[i].orderStatus,
+                                        "desc": dataJson[i].sAddress + "*" + dataJson[i].rAddress
+                                    };
+                                    optionOrder.push(optionOrderDetail);
+                                    break;
+                                case "已完成":
+                                    var completeDetail = {
+                                        "id": dataJson[i].orderId,
+                                        "userName": dataJson[i].sName,
+                                        "transportId": dataJson[i].transportId,
+                                        "position": [dataJson[i].sPositionSet.split(",")[0], dataJson[i].sPositionSet.split(",")[1]],
+                                        "itemColor": "#7FFFAA",
+                                        "className": "my-svg-marker",
+                                        "circle": {},
+                                        "type": "1",
+                                        "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
+                                        "orderStatus": dataJson[i].orderStatus,
+                                        "desc":  dataJson[i].sAddress + "*" +  dataJson[i].rAddress 
+                                    };
+                                    completeOrder.push(completeDetail);
+                                    break;
+                            }
+                        }
+                    }
+                    //读取所有的后勤信息，添加后勤的信息
+                    mapDatas = {
+                        "waitOrder": waitOrder,
+                        "optionOrder": optionOrder,
+                        "completeOrder": completeOrder
+                    };
+                    LoadLogiscData();
+                    //加载地图
+                    CreateMap("list_first", mapDatas.waitOrder);
+                },
+                fail: function (json) {
+                    alert(json)
+                }
+            });
+        }
+        function LoadLogiscData() {
+            $.ajax({
+                url: '/DTService/MonitorCenter/GetAllLogiscLocationData',
+                type: 'GET',
+                async: false,
+                data: {},
+                success: function (json) {
+                    if (json == "") {
+                        alert("当前系统没有后勤人员，请联系后勤人员注册！")
+                        return
+                    }
+                    var dataJson = JSON.parse(json);
+
+                    for (var i = 0; i < dataJson.length; i++) {
+                        if (dataJson[i].position == null) {
+                            alert("请联系后勤人员" + dataJson[i].userName + "(" + dataJson[i].userTlp + ")" + "上传位置!");
+                            break;
+                        }
+                        var logicDataDetail = {
+                            id: dataJson[i].userId,
+                            userName: dataJson[i].userName,
+                            position: [dataJson[i].position.split(",")[0], dataJson[i].position.split(",")[1]],
+                            itemColor: "red",
+                            className: "my-svg-marker",
+                            type: "2",
+                            circle: {
+                                radius: 8000,
+                                strokeColor: '#000',
+                                fillColor: 'gray',
+                                fillOpacity: 0.5
+                            },
+                            orderName: "后勤：" + dataJson[i].userName + "(" + dataJson[i].userTlp + ")",
+                            desc: dataJson[i].addressName
+                        };
+                        waitOrder.push(logicDataDetail);
+                        optionOrder.push(logicDataDetail);
+                        completeOrder.push(logicDataDetail);
+                    }
+                },
+                fail: function (json) {
+                    alert(json)
+                }
+            });
+        }
+        //格式化时间的函数
+        function getIntervalHour(startDate, endDate) {
+            var ms = endDate.getTime() - startDate.getTime();
+            if (ms < 0) return 0;
+            return Math.floor(ms / 1000 / 60 / 60);
+        }
+        function isEmptyObject(obj) {
+            for (var key in obj) {
+                return false;//返回false，不为空对象
+            }
+            return true;//返回true，为空对象
+        }
+        function GetEl(id) {
+            return typeof id === "string" ? document.getElementById(id) : null;
+        }
+        //创建地图的函数
+        function CreateMap(mapContainerId, mapData) {
+            AMapUI.loadUI(['misc/MarkerList', 'overlay/SvgMarker', 'overlay/SimpleInfoWindow'],
+              function (MarkerList, SvgMarker, SimpleInfoWindow) {
+
+                  if (!SvgMarker.supportSvg) {
+                      //当前环境并不支持SVG，此时SvgMarker会回退到父类，即SimpleMarker
+                      alert('当前环境不支持SVG');
+                  }
+                  markerList = new MarkerList({
+                      //关联的map对象
+                      map: map,
+
+                      //列表的dom容器的id
+                      listContainer: mapContainerId,
+
+                      //需要监听的列表节点事件
+                      listElementEvents: ['click'],
+
+                      //需要监听的marker事件
+                      markerEvents: ['click', 'mouseover'],
+
+                      //需要监听的infoWindow事件
+                      infoWindowEvents: ['click'],
+
+                      //返回数据项的Id
+                      getDataId: function (dataItem, index) {
+                          //index表示该数据项在数组中的索引位置，从0开始，如果确实没有id，可以返回index代替
+                          return dataItem.id;
+                      },
+                      //返回数据项的位置信息，需要是AMap.LngLat实例，或者是经纬度数组，比如[116.789806, 39.904989]
+                      getPosition: function (dataItem) {
+                          return dataItem.position;
+                      },
+                      //返回数据项对应的Marker
+                      getMarker: function (dataItem, context, recycledMarker) {
+                          //自定义一个lable去区分订单
+                          var label = "";
+                          if (dataItem.type == "1") {
+                              label = dataItem.userName;
+                          } else {
+                              label = dataItem.userName;
+                          }
+                          //var label = dataItem.orderName;
+                          //存在可回收利用的marker
+                          if (recycledMarker) {
+                              //直接更新内容返回
+                              recycledMarker.setIconLabel(label);
+                              return recycledMarker;
+                          }
+
+                          //判断是后勤还是客户
+                          if (dataItem.type == "1") {
+                              return new SvgMarker(
+                                  new SvgMarker.Shape.WaterDrop({
+                                      height: 50,
+                                      strokeWidth: 1,
+                                      strokeColor: '#ccc',
+                                      fillColor: dataItem.itemColor
+                                  }), {
+                                      iconLabel: label,
+                                      containerClassNames: dataItem.className,
+                                      showPositionPoint: true
+                                  })
+                          } else {
+                              return new SvgMarker(
+                                  new SvgMarker.Shape.RectangleFlagPin({
+                                      height: 90,
+                                      strokeWidth: 1,
+                                      strokeColor: '#ccc',
+                                      fillColor: dataItem.itemColor
+                                  }), {
+                                      iconLabel: label,
+                                      containerClassNames: dataItem.className,
+                                      showPositionPoint: true
+                                  })
+                          }
+                          //返回一个新的Marker
+
+                      },
+                      //返回数据项对应的列表节点
+                      getListElement: function (dataItem, context, recycledListElement) {
+                          //如果circle为空就是快递的位置，只显示图标
+                          if (!isEmptyObject(dataItem.circle)) {
+                              return
+                          } else {
+                              var tpl = '<a><%- dataItem.desc %>';
+                              var content = MarkerList.utils.template(tpl, {
+                                  dataItem: dataItem,
+                                  dataIndex: context.index
+                              });
+
+                              if (recycledListElement) {
+                                  //存在可回收利用的listElement, 直接更新内容返回
+                                  recycledListElement.innerHTML = content;
+                                  return recycledListElement;
+                              }
+
+                              //返回一段html，MarkerList将利用此html构建一个新的dom节点
+                              return '<li>' + content + '</li>';
+                          }
+
+                      },
+                      getInfoWindow: function (dataItem, context, recycledInfoWindow) {
+                          var orderDesc = "";
+                          var str = dataItem.orderStatus == '结束' ? '进行中' : dataItem.orderStatus
+                          if (dataItem.type == "1") {
+                              debugger
+                              orderDesc = "起点：" + dataItem.desc.split('*')[0] + "</br>" + "终点：" + dataItem.desc.split('*')[1] + "</br>" + "订单状态：" + str + "</br>" + "订单号：" + dataItem.transportId
+
+                          } else {
+                              orderDesc = "位置：" + dataItem.desc
+                          }
+                          if (recycledInfoWindow) {
+                              //存在可回收利用的infoWindow, 直接更新内容返回
+                              recycledInfoWindow.setInfoTitle(dataItem.orderName);
+                              recycledInfoWindow.setInfoBody(orderDesc);
+                              return recycledInfoWindow;
+                          }
+                          //返回一个新的InfoWindow
+                          return new SimpleInfoWindow({
+                              offset: new AMap.Pixel(0, -57),
+                              infoTitle: dataItem.orderName,
+                              infoBody: orderDesc
+                          });
+                      }
+                  });
+
+                  let CheckReCordData=new Array();
+                  markerList.on('listElementClick ' +
+                    'markerClick ' +
+                    'infoWindowClick',
+                    function (event, record) {
+                        var eventType = event.originalEvent.MarkerListEventType;
+                        if (eventType == "markerClick") {
+                            if (mapContainerId != "list_first") {
+                                //mapContainerId == "list_second" ? alert("订单处理中,请勿重复进操作！") : alert("订单已完成,请勿重复进操作！");
+                                return;
+                            }
+                            let isCheckRecor = false;
+                            for (let i = 0; i < CheckReCordData.length; i++) {
+                                if (CheckReCordData[i].id == record.data.id) {
+                                    alert("该订单已被选择，请选择其他订单！")
+                                    return;
+                                }
+                            }
+                            CheckReCordData.push(record.data);
+                            var orderName = record.data.orderName;
+                            record.data.checkStatus = true;
+                            var inner = '';
+                            if (record.data.type == "2") {
+                                inner = '<span style="color:#000;">' + orderName + '</span>' + '<button class="btn-xs btn-danger">删除</button>';
+                            } else {
+                                inner = orderName + '<button class="btn-xs btn-danger">删除</button>';
+                            }
+                            var li = document.createElement('li');
+                            li.setAttribute("data-id", record.data.id);
+                            li.setAttribute("data-type", record.data.type);
+                            li.setAttribute("data-username", record.data.orderName);
+                            li.setAttribute("data-position", record.data.position);
+                            li.setAttribute("data-desc", record.data.desc);
+                            li.innerHTML = inner;
+                            // 添加元素
+                            GetEl('OrderCheckList').insertBefore(li, GetEl('OrderCheckList').children[0]);
+                            // 1.5 删除订单
+                            var buttons = GetEl('OrderCheckList').getElementsByTagName('button');
+                            for (let i = 0; i < buttons.length; i++) {
+                                let button = buttons[i];
+                                button.onclick = function () {
+                                    // 1.6 获取父标签,删除
+                                    let checkRecord = -1;
+                                    for (var x = 0; x < CheckReCordData.length; x++) {
+                                        if (CheckReCordData[x].id == this.parentNode.getAttribute('data-id')) {
+                                            this.parentNode.remove();
+                                            checkRecord = x;
+                                            break;
+                                        }
+                                    }
+                                    CheckReCordData.splice(checkRecord, 1);
+                                }
+                            }
+                        }
+                    });
+
+                  //监听选中改变
+                  markerList.on('markerMouseover', function (event, info) {
+
+                      var $ = MarkerList.utils.$, template = MarkerList.utils.template;
+                      var str = info.data.orderStatus == '结束' ? '进行中' : info.data.orderStatus
+                      if (info.data.type == "1") {
+                          $('#eventInfo').html(info.data.orderName +
+                       '<div class="eventType">' + '起点：' + info.data.desc.split("*")[0] + '</br>' +
+                       '终点：' + info.data.desc.split("*")[1] + '</br>' +
+                       '状态：' + str + "</br>" + "订单号：" + info.data.transportId +
+                       '</div>');
+                      } else {
+                          $('#eventInfo').html(template('<%- record.data.orderName %>' +
+                     '<div class="eventType"><%- record.data.desc%></div>', {
+                         event: event,
+                         record: info
+                     }));
+
+                      }
+
+                  });
+                  //监听marker在Map的添加和删除.判断是否添加闪烁区域
+                  markerList.on('markerAddToMap markerRemoveFromMap', function (event, record) {
+                      var marker = record.marker,
+                        dataItem = record.data;
+                      if (isEmptyObject(dataItem.circle)) {
+                          return
+                      }
+                      if (!marker._circle) {
+                          //创建一个新的circle，附加在Marker上
+                          marker._circle = new AMap.Circle(dataItem.circle);
+
+                      } else {
+                          //circle已经存在（切换数据时，marker会被回收利用），更新
+                          marker._circle.setOptions(dataItem.circle);
+                      }
+
+                      switch (event.type) {
+                          case 'markerAddToMap':
+
+                              //更新map
+                              marker._circle.setMap(marker.getMap());
+
+                              //更新position
+                              marker._circle.setCenter(marker.getPosition());
+
+                              break;
+
+                          case 'markerRemoveFromMap':
+                              marker._circle.setMap(null);
+                              break;
+                      }
+                  });
+                  //构建一个数据项数组，数据项本身没有格式要求，但需要支持下述的getDataId和getPosition
+                  markerList.render(mapData);
+              });
+        }
+
+    </script>
+</body>
+</html>

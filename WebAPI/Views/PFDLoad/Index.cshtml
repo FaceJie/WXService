@@ -1,0 +1,143 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="~/Scripts/userCss/style.css" rel="stylesheet" />
+</head>
+<body>
+    <!--GPS-->
+    <div class="myNav" id="myNav">
+        <ol id="ol">
+            <li class="current">第1层</li>
+            <li>第2层</li>
+            <li>第3层</li>
+            <li>第4层</li>
+            <li>第5层</li>
+        </ol>
+        <div class="close_btn" id="close_btn">
+
+        </div>
+    </div>
+
+    <!--楼层-->
+    <ul id="ul">
+        <li>
+            <iframe src="http://localhost:56242/temp/pdfFiles/China/China.pdf" width="100%" height="100%"></iframe>
+        </li>
+        <li>
+            <iframe src="http://localhost:56242/temp/pdfFiles/China/China.pdf" width="100%" height="100%"></iframe>
+        </li>
+        <li>
+            <iframe src="http://localhost:56242/temp/pdfFiles/China/China.pdf" width="100%" height="100%"></iframe>
+        </li>
+        <li>
+            <iframe src="http://localhost:56242/temp/pdfFiles/China/China.pdf" width="100%" height="100%"></iframe>
+        </li>
+        <li>
+            <iframe src="http://localhost:56242/temp/pdfFiles/China/China.pdf" width="100%" height="100%"></iframe>
+        </li>
+    </ul>
+    <script src="~/Scripts/userJs/myFunc.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        window.onload = function () {
+            // 1. 获取需要的标签
+            var ol = JQ('ol'), ul = JQ('ul'), close_btn = JQ("close_btn"), myNav = JQ("myNav");
+            var ulLis = ul.children;
+            var olLis = ol.children;
+            var isClick = false;
+            myNav.style.height = olLis.length*50 + 'px';
+            myNav.style.width = 210 + 'px';
+            //myNav.style.top=
+
+
+            // 2. 上色
+            var colorArr = ['red', 'green', 'blue', 'purple', 'yellow'];
+            for (var i = 0; i < colorArr.length; i++) {
+                ulLis[i].style.backgroundColor = colorArr[i];
+            }
+
+            // 3. 监听GPS的点击
+            for (var j = 0; j < olLis.length; j++) {
+                (function (index) {
+                    var olLi = olLis[index];
+                    // 3.1 点击切换
+                    olLi.onmousedown = function () {
+
+                        isClick = true;
+
+                        for (var i = 0; i < olLis.length; i++) {
+                            olLis[i].className = "";
+                        }
+                        this.className = "current";
+
+                        // 3.2 让内容滚动起来
+                        // document.documentElement.scrollTop = index * client().height;
+                        buffer(document.documentElement, { scrollTop: index * client().height }, function () {
+                            isClick = false;
+                        });
+                        //下载预览pdf文件和其他文件
+                        /*$.ajax({
+                            url: '/QZService/PFDLoad/LoadCountryPdf',
+                            type: 'GET',
+                            data:{"country":"China"},
+                            successs: function (data)
+                            {
+                                console.log(data)
+                            },
+                            error:function(){
+
+                            }
+                       });*/
+                    }
+                })(j);
+            }
+
+            // 4.监听滚动
+            window.onscroll = function () {
+                if (!isClick) {
+                    console.log(111111);
+                    // 4.1 获取滚动产生的高度
+                    var roll = Math.ceil(scroll().top);
+                    // 4.2 遍历
+                    for (var i = 0; i < olLis.length; i++) {
+                        // 4.3 判断
+                        if (roll >= ulLis[i].offsetTop) {
+                            for (var j = 0; j < olLis.length; j++) {
+                                olLis[j].className = "";
+                            }
+                            olLis[i].className = "current";
+                        }
+                    }
+                }
+            }
+
+            //5.侧边栏效果（上下居中，可以浮动）
+            close_btn.onclick = function () {
+                if (getCSSAttrValue(ol, "display") == 'block') {
+                    // 3.2 让内容滚动起来
+                    ol.style.display = "none"
+                    buffer(myNav, { left: -190 }, function () {
+
+                    });
+                } else {
+                    ol.style.display = "block"
+                    buffer(myNav, { left: 0 }, function () {
+
+                    });
+                }
+            }
+            
+
+
+
+        }
+    </script>
+</body>
+</html>

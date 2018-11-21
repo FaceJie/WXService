@@ -1,0 +1,132 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>wepuploader</title>
+    <link href="~/Content/swf/css/webuploader.css" rel="stylesheet" />
+    <link href="~/Content/swf/css/demo.css" rel="stylesheet" />
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            text-decoration: none;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .content {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .VisaInfo {
+            width: 80%;
+            margin: 50px auto;
+            height: 190px;
+            background: #40B9DE;
+        }
+        #searchForm{
+            padding:50px;
+        }
+        .mt20 {
+            margin-top: 20px;
+        }
+
+        .header_center {
+            width: 300px;
+            height: 34px;
+            background-color: #cccccc;
+        }
+
+            .header_center input {
+                width: 100%;
+                height: 100%;
+                padding: 10px;
+                box-sizing: border-box; /*带有指定宽度和高度的框，并把边框和内边距放入框中。*/
+                outline: none; /*去除边框样式*/
+                background-color: #fafafa;
+                border: 1px solid #ddd;
+                font-size: 15px;
+                resize: none;
+            }
+    </style>
+</head>
+<body>
+    <section class="VisaInfo">
+        <form id="searchForm">
+            <div class="header_center">
+                <input class="" name="needCountry" placeholder="输入国家中文名称" value="" size="27" />
+            </div><br/>
+            <div class="header_center">
+                <input class="" name="needEnglishCountry" placeholder="输入国家英文名称" value="" size="27" />
+            </div>
+        </form>
+    </section>
+    <section class="content">
+        <div id="uploader" class="wu-example uploader mt20">
+            <div class="queueList">
+                <div id="placeholder" class="placeholder">
+                    <div id="filePicker" class="webuploader-container">
+                        <div>点击选择文件</div>
+                        <div style="position: absolute; top: 0; left: 238px; width: 168px; height: 44px; overflow: hidden; bottom: auto; right: auto;">
+                            <input type="file" name="file" class="webuploader-element-invisible" multiple="multiple">
+                            <label style="opacity: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: rgb(255, 255, 255);"></label>
+                        </div>
+                    </div>
+                    <p>直接拖动文件到此处</p>
+                </div>
+                <ul id="filelist" class="filelist"></ul>
+            </div>
+            <div id="statusBar" class="statusBar" style="display: none;">
+                <div class="progress" style="display: none;">
+                    <span class="text">0%</span>
+                    <span class="percentage" style="width: 0;"></span>
+                </div><div id="info" class="info">共0个（0B），已上传0个</div>
+                <div class="btns">
+                    <div id="picker" class="webuploader-container continueAdding">
+                        <div class="webuploader-pick">继续添加</div>
+                        <div style="position: absolute; top: 0px; left: 0px; width: 1px; height: 1px; overflow: hidden;">
+                            <input type="file" name="file" class="webuploader-element-invisible" multiple="multiple">
+                            <label style="opacity: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: rgb(255, 255, 255);"></label>
+                        </div>
+                    </div>
+                    <div id="uploadBtn" class="uploadBtn state-pedding">开始上传</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="~/Content/swf/js/jquery-3.1.1.js"></script>
+    <script src="~/Content/swf/js/JQConfig.js"></script>
+    <script src="~/Content/swf/js/webuploader.js"></script>
+    <script src="~/Content/swf/js/WConfig.js"></script>
+    <script type="text/javascript">
+        let option = {
+            thumbnail: [120, 120],
+            upLoaderID: '#uploader',                           // 上传图片功能容器
+            previewID: '#filelist',                            // 图片容器
+            server: '/FilesUp/UploadFilesToServer',
+            pick: '#filePicker',
+            addButton: {
+                id: '#picker',                             // 继续添加按钮
+                label: '继续添加'
+            },
+            statusBar: '#statusBar',                           // 状态栏，包括进度和控制按钮
+            info: '#info',                                     // 文件总体选择信息。
+            placeHolder: '#placeholder',
+            progress: '#progress',
+            dnd: '#placeholder',                                    // 指定Drag And Drop拖拽的容器
+            paste: '#uploader',                                 // 指定监听paste事件的容器，此功能为通过粘贴来添加截屏的图片
+            uploadBtn: '#uploadBtn'                             // 开始上传按钮
+        };
+        $.upload.init(option);
+    </script>
+</body>
+</html>

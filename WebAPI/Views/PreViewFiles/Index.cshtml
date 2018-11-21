@@ -1,0 +1,131 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=0,minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文件查看和下载</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Scripts/userCss/ViewandDonw.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+
+        <div class="row">
+            <div class="search-bar">
+                <input type="text" placeholder='请选择国家' placeholder-class="placeholder" />
+                <div class="clear" id="select-but"></div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <!--这里是要显示一个pdf文档-->
+            <iframe class="content" id="target_pdf" src="a.html">
+
+
+            </iframe>
+            <!--这里下载文件按钮，涉及到跨域-->
+        </div>
+        <div class="row">
+            <div class="desc-content">
+                <!--这里是描述性文字-->
+                <blockquote> 客户姓名：向杰 </blockquote>
+                <blockquote> 客人姓名：向杰 </blockquote>
+                <blockquote> 客人英文姓名：Face Jie </blockquote>
+                <blockquote> 客户性别：男 </blockquote>
+                <blockquote> 客户生日：9557 </blockquote>
+            </div>
+        </div>
+        <div class="row pre-scrollable list-box" id="list-box" style="height:300px;max-height:600px;display: none;">
+            <ul class="list" id="list"></ul>
+        </div>
+        <div class="bottom-bar">
+            <button class="btn btn-info btn-lg" id="downFile" onclick="down(this)">下载</button>
+        </div>
+       
+    </div>
+
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        $("#select-but").on("click",function(){
+            var box=$("#list-box");
+            if(box.css("display")=='none'){
+                LoadList();
+                box.css("display","block");
+            }else{
+                box.css("display","none");
+            }
+        });
+    });
+
+    function down(e) {
+        var url = e.getAttribute('data-url');
+        if (url==""||url==null) {
+            alert("请选择文件进行下载！");
+            return;
+        }
+        var fileName = url.split("/temp")[1];
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            var a;
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                a = document.createElement('a');
+                a.href = window.URL.createObjectURL(xhttp.response);
+                a.download = "日本需求表.doc";//自己控制文件类型和名称
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+            }
+        };
+        var url = "/Api/DownAndPreview/GetFileFromWebApi?fileName=" + fileName;
+        xhttp.open("GET", url);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.responseType = 'blob';
+        xhttp.send();
+    }
+    function SelecteVal(e) {
+        var box=$("#list-box").css("display","none");
+        //呈现选中的内容
+        var downFile = $("#downFile")[0];
+        downFile.setAttribute("data-url", e.dataset.json);
+        //更改ifram的src
+        $("#target_pdf").attr("src", "b.html")
+        //更新描述信息
+    }
+    function LoadList(){
+
+        $.ajax({
+            type:'Get',
+            async:false,
+            url:'/QZService/FilesUp/GetAllVisaNeed',
+            success:function(json){
+                
+                var json = JSON.parse(json);
+                var targrtUl=$("#list");
+                var li='';
+                json.forEach(item => {
+                li+=`
+                <li class ="list-item" data-json= `+json[0].needDemandUrl+` onclick="SelecteVal(this);">
+                    <div class ="item-img"><img src="../Content/images/word.png" /></div>
+                    <div class="item-text">
+                        <div class="myfooter">`+item.needTableName+`</div>
+                    </div>
+                </li>`;
+                });
+                targrtUl.html(li);
+            },
+            error:function(json){
+                alert(json)
+            }
+        });
+    }
+    </script>
+</body>
+</html>

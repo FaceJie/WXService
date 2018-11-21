@@ -1,0 +1,192 @@
+﻿.container {
+    
+    margin: 0 auto;
+    height: auto;
+}
+/*iphone 5/5s/5se */
+@media screen and (max-width:374px) and (min-width: 320px){
+     .container {
+        width: 320px;
+    }
+}
+/*iphone 6/7/8 */
+@media screen and (min-width:375px) and (max-width:413px){
+    .container {
+        width: 375px;
+    }
+}
+@media screen and (max-width: 992px) and (min-width: 768px) {
+    .container {
+        width: 768px;
+    }
+}
+@media screen and (max-width: 1200px) and (min-width: 992px) {
+    .container {
+        width: 992px;
+    }
+}
+
+
+
+/*iphone 6p/7p/8p */
+@media screen and (min-width:668px) and (max-width:737px){
+     .container {
+        width: 710px;
+    }
+}
+/*iphone x */
+@media screen and (min-width:737px) and (max-width:813px){
+    .container {
+        width: 790px;
+    }
+}
+/*ipad*/
+@media screen and (min-width:813px) and (max-width:1025px) {
+    .container {
+        width: 1000px;
+    }
+}
+
+.search-bar {
+    display: inline-block;
+    background: #2BA1F9;
+    width: 100%;
+    line-height: 50px;
+    position: relative;
+}
+
+    .search-bar input {
+        width: 95%;
+        height: 100%;
+        padding: 5px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        outline: none; /*去除边框样式*/
+        background-color: #fafafa;
+        border: 1px solid #ddd;
+        font-size: 15px;
+        resize: none;
+        z-index: 1;
+        margin-left: 10px;
+    }
+
+.clear {
+    display: inline-block;
+    position: absolute;
+    line-height: 50px;
+    height: 40px;
+    width: 40px;
+    right: 10px;
+    top: 5px;
+    z-index: 2;
+    text-align: center;
+    background: url("../../Content/images/login/clear.png") no-repeat center center;
+    background-size: 30px 30px;
+}
+
+.list-box {
+    max-height: 700px;
+    height: auto;
+    position: absolute;
+    width: 100%;
+    top: 50px;
+    left: 15px;
+    background: #fff;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    ul.list li {
+        height: 70px;
+        list-style: none;
+        width: 100%;
+        display: flex;
+        line-height: 70px;
+        padding-left: 0;
+        flex-direction: row;
+        justify-content: space-between;
+        justify-items: center;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #ccc;
+    }
+
+li .item-img {
+    height: 70px;
+    width: 20%;
+    text-align: center;
+    color: #fff;
+    padding: 5px;
+    position: relative;
+}
+
+.item-img img {
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -25px;
+    margin-top: -25px;
+}
+
+.item-text {
+    height: 70px;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.myfooter {
+    height: 50%;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+/*中间类容*/
+.content {
+    height: 400px;
+    width: 100%;
+}
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    height: 65px;
+    box-sizing: border-box;
+    border-top: 1px solid #e5e5e5;
+    background: rgba(255,255,255,0.8);
+}
+
+    .bottom-bar button {
+        width: 300px;
+        height: 50px;
+        position: absolute;
+        background:#2BA1F9 !important;
+        top: 50%;
+        left: 50%;
+        margin-left: -150px;
+        margin-top: -25px;
+    }
+
+.desc-content {
+    width: 100%;
+    height: auto;
+    margin-bottom: 80px;
+}
+
+blockquote {
+    padding: 5px !important;
+    font-style: normal !important;
+    border-color: #0ae;
+}
+
