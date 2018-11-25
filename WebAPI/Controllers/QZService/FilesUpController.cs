@@ -24,27 +24,13 @@ namespace WebAPI.Controllers.QZService
             string sData = Request.Params.Get("data");
             if (!string.IsNullOrEmpty(sData))
             {
-                CountryVisaInfoNeed modelView = GlobalFuc.JsonToModel<CountryVisaInfoNeed>(sData);
-                CountryVisaInfoNeed model = new CountryVisaInfoNeed();
-                model.needId = Guid.NewGuid().ToString("N");
-                string ServerUrl = "https://" + base.HttpContext.Request.Url.Host;
-                string needTableImgUrl = ServerUrl + "/temp/needTableImgUrl/" + model.needId + ".png";//申请表图片
-                string needDemandImgUrl = ServerUrl + "/temp/needDemandImgUrl/" + model.needId + ".jpg";//需求表图片
-                string needTableUrl = ServerUrl + "/temp/needTableUrl/" + model.needId + ".doc";//申请表
-                string needDemandUrl = ServerUrl + "/temp/needDemandUrl/" + model.needId + ".doc";//需求表
-                model.needTableName= "";
-                model.needTableUrl = needTableUrl;
-                model.needDemandName ="";
-                model.needDemandUrl = needDemandUrl;
-                model.needTableImgUrl = needTableImgUrl;
-                model.needDemandImgUrl = needDemandImgUrl;
-                model.needCountry = modelView.needCountry;
-                model.needEnglishCountry = modelView.needEnglishCountry;
-                if (bal.Save(model))
+                FilesUpViewModel modelView = GlobalFuc.JsonToModel<FilesUpViewModel>(sData);
+                modelView.needId = Guid.NewGuid().ToString("N");
+                if (bal.Save(modelView))
                 {
                     var result = new
                     {
-                        needId = model.needId
+                        needId = modelView.needId
                     };
                     return Json(result, JsonRequestBehavior.AllowGet);
                 }
@@ -54,7 +40,11 @@ namespace WebAPI.Controllers.QZService
         public JsonResult UploadFilesToServer()
         {
             string picID = "";
-            string tempPIC_ID = Request.Form["needId"];
+            //上传参数
+            string needId = Request.Form["needId"];
+            string ServerUrl = "https://" + base.HttpContext.Request.Url.Host+":"+ base.HttpContext.Request.Url.Port;
+            FilesUpViewModel filesUpViewModel;
+            //流文件
             int bufferLen = 1024;
             byte[] buffer = new byte[bufferLen];
             int contentLen = 0;
@@ -67,6 +57,8 @@ namespace WebAPI.Controllers.QZService
             {
                 if (Request.Files["file"] != null)
                 {
+                    filesUpViewModel=new FilesUpViewModel();
+                    filesUpViewModel.needId = needId;
                     try
                     {
                         HttpPostedFileBase postFileBase = Request.Files["file"];
@@ -74,33 +66,28 @@ namespace WebAPI.Controllers.QZService
                         uploadStream = postFileBase.InputStream;
                         string Ext = Path.GetExtension(postFileBase.FileName);
                         string baseUrl = Server.MapPath("/");
-                        switch (Ext)
+                        if (Ext== ".png"|| Ext == ".jpg")
                         {
-                            case ".png":
-                                uploadPath = baseUrl + @"\temp\needTableImgUrl\";
-                                fileName = tempPIC_ID + ".png";
-                                break;
-                            case ".jpg":
-                                uploadPath = baseUrl + @"\temp\needDemandImgUrl\";
-                                fileName = tempPIC_ID + Ext;
-                                
-                                break;
-                            case ".doc":
-                                uploadPath = baseUrl + @"\temp\needTableUrl\";
-                                fileName = tempPIC_ID + ".doc";
-                                //needTableName
-                                bal.SaveName(fileReallyName, tempPIC_ID, "needTableName");
-                                break;
-                            case ".docx":
-                                uploadPath = baseUrl + @"\temp\needDemandUrl\";
-                                fileName = tempPIC_ID + ".doc";
-                                //needDemandName
-                                bal.SaveName(fileReallyName, tempPIC_ID, "needDemandName");
-                                break;
-                            default:
-                                picID = "error";
-                                break;
+                            uploadPath = baseUrl + @"\temp\images\";
+                            fileName = needId + Ext;
+
+                           
+                            filesUpViewModel.fileImg= ServerUrl + "/temp/images/" + fileName;
                         }
+                        else if (Ext == ".docx" || Ext == ".doc"|| Ext == ".pdf")
+                        {
+                            uploadPath = baseUrl + @"\temp\files\";
+                            fileName = fileReallyName + Ext;
+
+                            filesUpViewModel.fileType = Ext.TrimStart('.');
+                            filesUpViewModel.fileName = fileReallyName;
+                            filesUpViewModel.fileUrl = ServerUrl + "/temp/files/" + fileName;
+                        }
+                        else
+                        {
+                            picID = "error";
+                        }
+                      
                         if (!Directory.Exists(uploadPath))
                         {
                             Directory.CreateDirectory(uploadPath);
@@ -115,6 +102,11 @@ namespace WebAPI.Controllers.QZService
                         FileStream fsPic = new FileStream(uploadPath + fileName, FileMode.Open, FileAccess.ReadWrite);
                         byte[] pic = new byte[fsPic.Length];
                         fsPic.Read(pic, 0, pic.Length);
+                        //保存
+                        if (filesUpViewModel!=null)
+                        {
+                            bal.SaveName(filesUpViewModel);
+                        }
                         fsPic.Close();
                         picID = "scu";
                     }
@@ -175,14 +167,5 @@ namespace WebAPI.Controllers.QZService
             return json;
         }
     }
-    public class FilesUpViewModel
-    {
-        public string needId { get; set; }
-        public string needName { get; set; }
-        public string needType { get; set; }
-        public string needUrl { get; set; }
-        public string needImgUrl { get; set; }
-        public string needCountyr { get; set; }
-        public string needEnglishCountry { get; set; }
-    }
+    
 }

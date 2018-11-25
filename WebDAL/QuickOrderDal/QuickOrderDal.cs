@@ -57,25 +57,28 @@ namespace WebDAL
         public int KillOrder(UnitsModel unitsModel, string optionTransportId, string userId, string userName)
         {
             int i = 0;
-            string sql = "update dbo.QuickOrder set reallyDistance=@reallyDistance,orderReallyTime=@orderReallyTime,orderStatus=@orderStatus,lCompleteTime=@lCompleteTime where transportId = @transportId";
+            string sql = "update dbo.QuickOrder set recommendedDistance=@recommendedDistance,recommendedTime=@recommendedTime,recommendedRoute=@recommendedRoute,reallyDistance=@reallyDistance,orderReallyTime=@orderReallyTime,orderStatus=@orderStatus,lCompleteTime=@lCompleteTime where transportId = @transportId";
             SqlParameter[] para = new SqlParameter[] {
+                 new SqlParameter("@recommendedDistance",unitsModel.recommendedDistance),
+                new SqlParameter("@recommendedTime",unitsModel.recommendedTime),
+                 new SqlParameter("@recommendedRoute",unitsModel.recommendedRoute),
                 new SqlParameter("@reallyDistance",unitsModel.reallyDistance),
                 new SqlParameter("@orderReallyTime",unitsModel.orderReallyTime),
-                new SqlParameter("@orderStatus","待确认"),
+                new SqlParameter("@orderStatus","已完成"),
                 new SqlParameter("@lCompleteTime",DateTime.Now),
-                new SqlParameter("@transportId",optionTransportId)
+                new SqlParameter("@transportId",unitsModel.transportId)
             };
             try
             {
-                DataTable dt = GetReallDetailInfo(unitsModel.transportId);
+                DataTable dt = GetReallDetailInfo(optionTransportId);
                 i = SqlHelper.ExecteNonQueryText(sql, para);
                 //插入
-                sql = string.Format("insert into dbo.TravelDistance (transportId,positionSet) values('{0}','{1}')", optionTransportId, dt.Rows[0]["positionSet"].ToString());
+                sql = string.Format("insert into dbo.TravelDistance (transportId,positionSet) values('{0}','{1}')", unitsModel.transportId, dt.Rows[0]["positionSet"].ToString());
                 i = SqlHelper.ExecteNonQueryText(sql, null);
                 //删除
-                sql = string.Format("delete from dbo.TravelDistance where transportId = '{0}'", unitsModel.transportId);
+                sql = string.Format("delete from dbo.TravelDistance where transportId = '{0}'", optionTransportId);
                 i = SqlHelper.ExecteNonQueryText(sql, null);
-                ClientReciveOrder(userId,optionTransportId, userName);
+                ClientReciveOrder(userId);
             }
             catch (Exception ex)
             {
@@ -108,20 +111,21 @@ namespace WebDAL
         public int ShurtOrder(UnitsModel unitsModel,string userId,string userName)
         {
             int i = 0;
-            string sql = "update dbo.QuickOrder set recommendedDistance=@recommendedDistance,recommendedTime=@recommendedTime,reallyDistance=@reallyDistance,orderReallyTime=@orderReallyTime,orderStatus=@orderStatus,lCompleteTime=@lCompleteTime where transportId = @transportId";
+            string sql = "update dbo.QuickOrder set recommendedDistance=@recommendedDistance,recommendedTime=@recommendedTime,recommendedRoute=@recommendedRoute,reallyDistance=@reallyDistance,orderReallyTime=@orderReallyTime,orderStatus=@orderStatus,lCompleteTime=@lCompleteTime where transportId = @transportId";
             SqlParameter[] para = new SqlParameter[] {
                  new SqlParameter("@recommendedDistance",unitsModel.recommendedDistance),
                 new SqlParameter("@recommendedTime",unitsModel.recommendedTime),
+                new SqlParameter("@recommendedRoute",unitsModel.recommendedRoute),
                 new SqlParameter("@reallyDistance",unitsModel.reallyDistance),
                 new SqlParameter("@orderReallyTime",unitsModel.orderReallyTime),
-                new SqlParameter("@orderStatus","待确认"),
+                new SqlParameter("@orderStatus","已完成"),
                 new SqlParameter("@lCompleteTime",DateTime.Now),
                 new SqlParameter("@transportId",unitsModel.transportId)
             };
             try
             {
                 i = SqlHelper.ExecteNonQueryText(sql, para);
-                ClientReciveOrder(userId, unitsModel.transportId, userName);
+                ClientReciveOrder(userId);
              
             }
             catch (Exception ex)
@@ -133,41 +137,34 @@ namespace WebDAL
         }
         //结束订单
 
-        public int ClientReciveOrder(string userId, string transportId,string userName)
+        public int ClientReciveOrder(string userId)
         {
             int count = 0;
             try
             {
-                string sql = string.Format("update dbo.DataOrder set orderStatus='已完成',orderCompleteTime='{0}' OUTPUT  Inserted.logsticUserId where transportId='{1}'", DateTime.Now, transportId);
-                LogModelSet ls = new LogModelSet(new LogModel(userId, userName, userName + "结束了一条订单，订单号：" + transportId, 1), log);
-                DataTable dt = SqlHelper.GetTableText(sql, null)[0];
-                if (dt != null && dt.Rows.Count > 0)
+                string sql = string.Format("select * from dbo.OrderWaitData where logicsUserId='{0}' and orderStatus='待接单'", userId);
+                DataTable dt_new = SqlHelper.GetTableText(sql, null)[0];
+                string ids = "";
+                int completeCount = 0;
+                for (int i = 0; i < dt_new.Rows.Count; i++)
                 {
-                    sql = string.Format("select * from dbo.OrderWaitData where logicsUserId='{0}' and orderStatus='待接单'", dt.Rows[0]["logsticUserId"].ToString());
-                    DataTable dt_new = SqlHelper.GetTableText(sql, null)[0];
-                    string ids = "";
-                    int completeCount = 0;
-                    for (int i = 0; i < dt_new.Rows.Count; i++)
+                    ids = dt_new.Rows[i]["orderIds"].ToString().TrimEnd(',').Replace(",", "','"); ;
+                    string sql_new = string.Format("select orderId,lUserId,orderStatus from dbo.QuickOrder where lUserId='{0}' and orderId in('{1}')", userId, ids);
+                    DataTable dt_statusCheck = SqlHelper.GetTableText(sql_new, null)[0];
+                    for (int j = 0; j < dt_statusCheck.Rows.Count; j++)
                     {
-                        ids = dt_new.Rows[i]["orderIds"].ToString().TrimEnd(',').Replace(",", "','"); ;
-                        string sql_new = string.Format("select * from dbo.DataOrder where logsticUserId='{0}' and orderId in('{1}')", dt.Rows[0]["logsticUserId"].ToString(), ids);
-                        DataTable dt_statusCheck = SqlHelper.GetTableText(sql_new, null)[0];
-                        for (int j = 0; j < dt_statusCheck.Rows.Count; j++)
+                        if (dt_statusCheck.Rows[j]["orderStatus"].ToString() != "已完成")
                         {
-                            if (dt_statusCheck.Rows[j]["orderStatus"].ToString() != "已完成")
-                            {
-                                completeCount++;
-                                break;
-                            }
+                            completeCount++;
+                            break;
+                        }
 
-                        }
-                        if (completeCount == 0)
-                        {
-                            sql = string.Format("update dbo.OrderWaitData set orderStatus='已完成' where logicsUserId ='{0}' and orderIds='{1}'", dt.Rows[0]["logsticUserId"].ToString(), dt_new.Rows[i]["orderIds"].ToString());
-                            count = SqlHelper.ExecteNonQueryText(sql, null);
-                        }
                     }
-                    count = 1;
+                    if (completeCount == 0)
+                    {
+                        sql = string.Format("update dbo.OrderWaitData set orderStatus='已完成' where logicsUserId ='{0}' and orderIds='{1}'", userId, dt_new.Rows[i]["orderIds"].ToString());
+                        count = SqlHelper.ExecteNonQueryText(sql, null);
+                    }
                 }
             }
             catch (Exception ex)

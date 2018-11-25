@@ -19,48 +19,56 @@ namespace WebAPI.Controllers.QZService
         {
             return View();
         }
-
         //签证登录
-        public string CheckIsRegister(UserInfoViewModel userInfoViewModel)
+        public string UserLogin(string userName,string userpwd)
         {
-            MsgModel ret = new MsgModel();
-            if (bal.Checking(userInfoViewModel.NickName))
-            {
-                ret.scu = true;
-                ret.msg = "用户身份审核中!";
-                return GlobalFuc.ModelToJson<MsgModel>(ret);
-            }
-            try
-            {
-                VisaLoginModel visaLoginModel = bal.UserExsit(userInfoViewModel.NickName);
-                if (visaLoginModel != null)
-                {
-                    //存在用户
-                    ret.scu = true;
-                    DataCache.SetCache(visaLoginModel.UserId, visaLoginModel);//为了减少缓存，只把userId存储起来
-                    ret.msg = visaLoginModel.UserId + "*" + visaLoginModel.UserType;
-                }
-                else
-                {
-                    ret.scu = false;
-                    ret.msg = GlobalFuc.ModelToJson<UserInfoViewModel>(userInfoViewModel);//供注册使用
-                }
-            }
-            catch (Exception ex)
-            {
-                ret.scu = false;
-                ret.msg = ex.Message.ToString();//供注册使用
-            }
-           
+            MsgModel ret = bal.UserLogin(userName, userpwd);
             return GlobalFuc.ModelToJson<MsgModel>(ret);
         }
+
+
+
+        ////签证注册
+        //public string CheckIsRegister(UserInfoViewModel userInfoViewModel)
+        //{
+        //    MsgModel ret = new MsgModel();
+        //    if (bal.Checking(userInfoViewModel.NickName))
+        //    {
+        //        ret.scu = true;
+        //        ret.msg = "用户身份审核中!";
+        //        return GlobalFuc.ModelToJson<MsgModel>(ret);
+        //    }
+        //    try
+        //    {
+        //        VisaLoginModel visaLoginModel = bal.UserExsit(userInfoViewModel.NickName);
+        //        if (visaLoginModel != null)
+        //        {
+        //            //存在用户
+        //            ret.scu = true;
+        //            DataCache.SetCache(visaLoginModel.UserId, visaLoginModel);//为了减少缓存，只把userId存储起来
+        //            ret.msg = visaLoginModel.UserId + "*" + visaLoginModel.UserType;
+        //        }
+        //        else
+        //        {
+        //            ret.scu = false;
+        //            ret.msg = GlobalFuc.ModelToJson<UserInfoViewModel>(userInfoViewModel);//供注册使用
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ret.scu = false;
+        //        ret.msg = ex.Message.ToString();//供注册使用
+        //    }
+           
+        //    return GlobalFuc.ModelToJson<MsgModel>(ret);
+        //}
        
 
         //签证系统注册新用户
-        public string UserRegister(string nickName, string avatarUrl, string userName, string userTlp, string userType, string code)
+        public string UserRegister(string nickName, string avatarUrl, string userName, string userTlp, string userType, string code,string pwd)
         {
             MsgModel ret = new MsgModel();
-            if (bal.Checking(nickName))
+            if (bal.Checking(userName, pwd))
             {
                 ret.scu = false;
                 ret.msg = "用户身份审核中!";
@@ -76,7 +84,7 @@ namespace WebAPI.Controllers.QZService
             {
                 if (PhoneCode.CheckCode(userTlp, code).Contains("200"))
                 {
-                    string result = bal.UserRegister(nickName, avatarUrl, userName, userType, userTlp);
+                    string result = bal.UserRegister(nickName, avatarUrl, userName, userType, userTlp, pwd);
                     if (!string.IsNullOrEmpty(result) && result != "erorr")
                     {
                         ret.scu = true;

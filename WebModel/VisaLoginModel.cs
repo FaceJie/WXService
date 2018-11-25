@@ -9,6 +9,7 @@ namespace WebModel
     public class VisaLoginModel
     {
         private string userId;
+        private string password;
         private string userName;
         private string userType;
         private string headUrl;
@@ -120,6 +121,19 @@ namespace WebModel
             set
             {
                 userType = value;
+            }
+        }
+
+        public string Password
+        {
+            get
+            {
+                return password;
+            }
+
+            set
+            {
+                password = value;
             }
         }
     }

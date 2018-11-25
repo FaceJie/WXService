@@ -189,6 +189,7 @@ namespace WebAPI.Controllers.QZService
             DateTime strat = DateTime.Now;
             //1、插入从推荐距离，修改详细数据
             DataTable dtDetail = bal.GetDetailInfo(transportId);
+
             DataTable dtReallDetail = bal.GetReallDetailInfo(transportId);
             if (dtDetail != null && dtDetail.Rows.Count > 0)
             {
@@ -203,12 +204,20 @@ namespace WebAPI.Controllers.QZService
                     //更新一下推荐距离数据
                     unitsModel.recommendedDistance = routeCommandModel.distance;
                     unitsModel.recommendedTime = routeCommandModel.duration;
+                    //叠加路线
+                    List<RouteModel> listFirst = routeCommandModel.steps;// 
+                    List<RouteModel> listSecond = GlobalFuc.JsonToList<RouteModel>(dtDetail.Rows[0]["recommendedRoute"].ToString());
+                    foreach (var item in listSecond)
+                    {
+                        listFirst.Add(item);
+                    }
+                    unitsModel.recommendedRoute = GlobalFuc.ModelToJson<RouteModel>(listFirst);
+
                     string distanceRex = @"[+-]?\d+[\.]?\d*";
                     double DistanceSpan = Math.Round(double.Parse(Regex.Match(routeCommandModel.distance, distanceRex).Value), 0) + Math.Round(double.Parse(Regex.Match(dtDetail.Rows[0]["recommendedDistance"].ToString(), distanceRex).Value), 0);
                     double TimeSpan = Math.Round(double.Parse(Regex.Match(routeCommandModel.duration, distanceRex).Value), 0) + Math.Round(double.Parse(Regex.Match(dtDetail.Rows[0]["recommendedTime"].ToString(), distanceRex).Value), 0); 
                     unitsModel.recommendedDistance = DistanceSpan+ "km";
                     unitsModel.recommendedTime = TimeSpan + "min";
-
                     distance = AmapUtil.OnlyGetDistance(positionData[0], positionData[positionData.Length - 1]);
                 }
                 else
@@ -221,7 +230,8 @@ namespace WebAPI.Controllers.QZService
                 unitsModel.reallyDistance = distance.ToString("0.00") + "km";
                 unitsModel.orderCompleteTime = strat;
                 unitsModel.transportId = dtDetail.Rows[0]["transportId"].ToString();
-                string userName= dtDetail.Rows[0]["rName"].ToString();
+                string userName= dtDetail.Rows[0]["lName"].ToString();
+
                 //把数据更新到数据库
                 int q = bal.ShurtOrder(unitsModel, userId,userName);
                 if (q > 0)
@@ -278,7 +288,7 @@ namespace WebAPI.Controllers.QZService
                 return GlobalFuc.ModelToJson<MsgModel>(ret);
             }
             //存储第一次位置
-            int old = bal.SavaLocationAll(userId, transportId, position);
+            int old = bal.SavaLocationAll(userId, optionTransportId, position);
             if (old < 0)
             {
                 ret.scu = false;
@@ -293,13 +303,16 @@ namespace WebAPI.Controllers.QZService
             DateTime strat = DateTime.Now;
             //1、插入从推荐距离，修改详细数据
             DataTable dtDetail = bal.GetDetailInfo(transportId);
-            DataTable dtReallDetail = bal.GetReallDetailInfo(transportId);
+
+            DataTable dtReallDetail = bal.GetReallDetailInfo(optionTransportId);
             if (dtDetail != null && dtDetail.Rows.Count > 0)
             {
+
                 RouteCommandModel routeCommandModel = new RouteCommandModel();
                 UnitsModel unitsModel = new UnitsModel();
-                DataRow data = dtReallDetail.Select("transportId='" + dtDetail.Rows[0]["transportId"].ToString() + "'")[0];
-                positionData = data["positionSet"].ToString().TrimEnd(';').Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                positionData = dtReallDetail.Rows[0]["positionSet"].ToString().TrimEnd(';').Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+
                 double distance = 0;
                 if (positionData.Length > 1)
                 {
@@ -307,11 +320,21 @@ namespace WebAPI.Controllers.QZService
                     //更新一下推荐距离数据
                     unitsModel.recommendedDistance = routeCommandModel.distance;
                     unitsModel.recommendedTime = routeCommandModel.duration;
+                    //叠加路线
+                    List<RouteModel> listFirst = routeCommandModel.steps;// 
+                    List<RouteModel> listSecond = GlobalFuc.JsonToList<RouteModel>(dtDetail.Rows[0]["recommendedRoute"].ToString());
+                    foreach (var item in listSecond)
+                    {
+                        listFirst.Add(item);
+                    }
+                    unitsModel.recommendedRoute= GlobalFuc.ModelToJson<RouteModel>(listFirst);
+
                     string distanceRex = @"[+-]?\d+[\.]?\d*";
                     double DistanceSpan = Math.Round(double.Parse(Regex.Match(routeCommandModel.distance, distanceRex).Value), 0) + Math.Round(double.Parse(Regex.Match(dtDetail.Rows[0]["recommendedDistance"].ToString(), distanceRex).Value), 0);
                     double TimeSpan = Math.Round(double.Parse(Regex.Match(routeCommandModel.duration, distanceRex).Value), 0) + Math.Round(double.Parse(Regex.Match(dtDetail.Rows[0]["recommendedTime"].ToString(), distanceRex).Value), 0);
                     unitsModel.recommendedDistance = DistanceSpan + "km";
                     unitsModel.recommendedTime = TimeSpan + "min";
+
                     distance = AmapUtil.OnlyGetDistance(positionData[0], positionData[positionData.Length - 1]);
                 }
                 else
@@ -324,7 +347,7 @@ namespace WebAPI.Controllers.QZService
                 unitsModel.reallyDistance = distance.ToString("0.00") + "km";
                 unitsModel.orderCompleteTime = strat;
                 unitsModel.transportId = dtDetail.Rows[0]["transportId"].ToString();
-                string userName = dtDetail.Rows[0]["rName"].ToString();
+                string userName = dtDetail.Rows[0]["lName"].ToString();
                 //把数据更新到数据库
                 int q = bal.KillOrder(unitsModel, optionTransportId, userId, userName);
                 if (q > 0)

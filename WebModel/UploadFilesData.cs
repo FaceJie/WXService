@@ -161,5 +161,18 @@ namespace WebModel
                 uploadTitle = value;
             }
         }
+
+       
+    }
+    public class FilesUpViewModel
+    {
+        public string needId { get; set; }
+        public string country { get; set; }
+
+        public string fileName { get; set; }
+        public string fileUrl { get; set; }
+        public string fileType { get; set; }
+        public string fileImg { get; set; }
+        public string discription { get; set; }
     }
 }

@@ -9,6 +9,8 @@ namespace WebAPI.Content.WXViewModel
     {
         private string avatarUrl;//微信头像
 
+        private string password;
+
         private string country;//国家
 
         private string province;//省市
@@ -109,6 +111,19 @@ namespace WebAPI.Content.WXViewModel
             set
             {
                 nickName = value;
+            }
+        }
+
+        public string Password
+        {
+            get
+            {
+                return password;
+            }
+
+            set
+            {
+                password = value;
             }
         }
     }

@@ -31,12 +31,44 @@ namespace WebDAL
             return visaLoginModel;
         }
 
+        public MsgModel UserLogin(string userName, string userpwd)
+        {
+            MsgModel ret = new MsgModel();
+            DataTable dt = new DataTable();
+            string sql = string.Format("select * from VisaLogin where userName='{0}' and password='{1}' and isInner=0", userName, userpwd);
+            dt = SqlHelper.GetTableText(sql, null)[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                ret.scu = false;
+                ret.msg = "用户审核中，请等待！";
+            }
+            else
+            {
+                sql = string.Format("select * from VisaLogin where userName='{0}' and password='{1}' and isInner=1", userName, userpwd);
+                dt = SqlHelper.GetTableText(sql, null)[0];
+                VisaLoginModel visaLoginModel = null;
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    visaLoginModel = new VisaLoginModel();
+                    loadEntity(dt.Rows[0], visaLoginModel);
+                    DataCache.SetCache(dt.Rows[0]["userId"].ToString(), visaLoginModel);
+                    ret.scu = true;
+                    ret.msg = dt.Rows[0]["userId"].ToString()+"*"+ dt.Rows[0]["userType"].ToString();
+                }
+                else
+                {
+                    ret.scu = false;
+                    ret.msg = "用户名者密码错误！";
+                }
+            }
+            return ret;
+        }
+
         public bool CheckUserName(string userName, string userType)
         {
-            string sql = "select * from VisaLogin where userName=@userName and userType=@userType";
+            string sql = "select * from VisaLogin where userName=@userName";
             SqlParameter[] pars ={
-                                    new SqlParameter("@userName",userName),
-                                     new SqlParameter("@userType",userType)
+                                    new SqlParameter("@userName",userName)
                                 };
             DataTable dt = SqlHelper.GetTableText(sql, pars)[0];
             
@@ -74,12 +106,13 @@ namespace WebDAL
 
 
         //是否在审核中
-        public bool Checking(string nickName)
+        public bool Checking(string userName, string pwd)
         {
             bool isInner = false;
-            string sql = "select * from VisaLogin where userNikeName=@userNikeName and isInner=0";
+            string sql = "select * from VisaLogin where userNikeName=@userNikeName and password=@password and isInner=0";
             SqlParameter[] pars ={
-                                    new SqlParameter("@userNikeName",nickName)
+                                    new SqlParameter("@userName",userName),
+                                    new SqlParameter("@password",pwd)
                                 };
             DataTable dt = SqlHelper.GetTableText(sql, pars)[0];
             if (dt!=null&&dt.Rows.Count>0)
@@ -94,13 +127,14 @@ namespace WebDAL
         }
        
         //2
-        public string UserRegister(string nickName, string avatarUrl, string userName, string userType,string userTlp)
+        public string UserRegister(string nickName, string avatarUrl, string userName, string userType,string userTlp,string pwd)
         {
             try
             {
-                string sql = "insert into VisaLogin(userName,userType,userTlp,userNikeName,headUrl,entryTime) output inserted.userId  values(@userName,@userType, @userTlp,@userNikeName,@headUrl,@entryTime)";
+                string sql = "insert into VisaLogin(userName,password,userType,userTlp,userNikeName,headUrl,entryTime) output inserted.userId  values(@userName,@password,@userType, @userTlp,@userNikeName,@headUrl,@entryTime)";
                 SqlParameter[] pars ={
                                     new SqlParameter("@userName",userName),
+                                      new SqlParameter("@password",pwd),
                                      new SqlParameter("@userType",userType),
                                     new SqlParameter("@userTlp",userTlp),
                                     new SqlParameter("@userNikeName", nickName),
@@ -166,6 +200,7 @@ namespace WebDAL
         public void loadEntity(DataRow row, VisaLoginModel model)
         {
             model.UserId = row["userId"] != DBNull.Value ? row["userId"].ToString() : string.Empty;
+            model.Password = row["password"] != DBNull.Value ? row["password"].ToString() : string.Empty;
             model.UserName = row["userName"] != DBNull.Value ? row["userName"].ToString() : string.Empty;
             model.UserType = row["userType"] != DBNull.Value ? row["userType"].ToString() : string.Empty;
             model.UserTlp = row["userTlp"] != DBNull.Value ? row["userTlp"].ToString() : string.Empty;

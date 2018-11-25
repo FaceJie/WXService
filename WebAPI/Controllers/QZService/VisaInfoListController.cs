@@ -20,7 +20,7 @@ namespace WebAPI.Controllers.QZService
         }
 
         //判断出签还是入签
-        public string CheckStaus(string userId,string sendDataTime, string passportNo, string country)
+        public string CheckStaus(string userId,string sendDataTime, string passportNo, string country,string tihuoWay)
         {
             string serviceName = "";
             string json = "";
@@ -52,7 +52,7 @@ namespace WebAPI.Controllers.QZService
                     return json;
                 }
             }
-            DataTable dt = bal.GetVisaInfoParams(serviceName, sendDataTime, passportNo, country);
+            DataTable dt = bal.GetVisaInfoParams(serviceName, sendDataTime, passportNo, country, tihuoWay);
             DataRow[] drSignIn, drUnderWay, drSignOut;
 
             if (dt != null && dt.Rows.Count > 0)

@@ -29,12 +29,13 @@
 
         .VisaInfo {
             width: 80%;
-            margin: 50px auto;
-            height: 190px;
+            margin: 20px auto;
+            height: 260px;
             background: #40B9DE;
         }
         #searchForm{
             padding:50px;
+            position:relative;
         }
         .mt20 {
             margin-top: 20px;
@@ -57,16 +58,22 @@
                 font-size: 15px;
                 resize: none;
             }
+
+            .header_right{
+               width: 600px;
+              height: 140px;
+            }
     </style>
 </head>
 <body>
     <section class="VisaInfo">
         <form id="searchForm">
             <div class="header_center">
-                <input class="" name="needCountry" placeholder="输入国家中文名称" value="" size="27" />
+                <input class="" name="country" placeholder="输入国家名称" value="" size="27" />
             </div><br/>
-            <div class="header_center">
-                <input class="" name="needEnglishCountry" placeholder="输入国家英文名称" value="" size="27" />
+           
+            <div class="header_right">
+                <textarea class="form-control" id="discription" name="discription" rows="16" style="min-width: 95%;height:100%;" placeholder="请输入描述信息"></textarea>
             </div>
         </form>
     </section>

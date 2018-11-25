@@ -9,7 +9,7 @@ namespace WebBLL
     {
         FilesUpDal dal = new FilesUpDal();
 
-        public bool Save(CountryVisaInfoNeed model)
+        public bool Save(FilesUpViewModel model)
         {
             return dal.Save(model);
         }
@@ -19,9 +19,9 @@ namespace WebBLL
             return dal.GetVisaNeedInfo();
         }
 
-        public bool SaveName(string fileReallyName,string tempNeedId, string where)
+        public bool SaveName(FilesUpViewModel filesUpViewModel)
         {
-            return dal.SaveName(fileReallyName, tempNeedId, where);
+            return dal.SaveName(filesUpViewModel);
         }
 
         public DataTable GetVisaNeedInfoByCountry(string countryName)
@@ -32,6 +32,11 @@ namespace WebBLL
         public DataTable GetCountry()
         {
             return dal.GetCountry();
+        }
+
+        public DataTable GetVisaTableList(string fileName)
+        {
+            return dal.GetVisaTableList(fileName);
         }
     }
 }

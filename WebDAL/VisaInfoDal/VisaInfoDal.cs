@@ -12,7 +12,7 @@ namespace WebDAL
     public class VisaInfoDal
     {
         //查询与名字相关的业务员以及送签与出签时间
-        public DataTable GetVisaInfoParams(string serviceName, string sendDataTime, string passportNo, string country)
+        public DataTable GetVisaInfoParams(string serviceName, string sendDataTime, string passportNo, string country,string tihuoWay)
         {
             string sql = "SELECT GroupNo,PassportNo, RealTime, FinishTime, client, InTime, OutTime, Name, EnglishName, Sex, Birthday, PassportNo, EntryTime, Types FROM VisaInfoWeChatView WHERE Types = '个签'";
             List<SqlParameter> para = new List<SqlParameter>();
@@ -23,8 +23,16 @@ namespace WebDAL
             }
             if (!string.IsNullOrEmpty(sendDataTime))
             {
-                para.Add(new SqlParameter("@sendDataTime", sendDataTime));
-                sql += " and RealTime=@sendDataTime ";
+                if (tihuoWay== "按进签时间查询")
+                {
+                    para.Add(new SqlParameter("@sendDataTime", sendDataTime));
+                    sql += " and RealTime=@sendDataTime";
+                }
+                else
+                {
+                    para.Add(new SqlParameter("@sendDataTime", sendDataTime));
+                    sql += " and FinishTime=@sendDataTime";
+                }
             }
             if (!string.IsNullOrEmpty(passportNo))
             {

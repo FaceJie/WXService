@@ -19,15 +19,21 @@ namespace WebBLL.VisaLoginBal
             return dal.UserExsit(userNikeName);
         }
 
-        public bool Checking(string nickName)
+        public bool Checking(string userName, string pwd)
         {
-            return dal.Checking(nickName);
+            return dal.Checking(userName,pwd);
         }
         //2
-        public string UserRegister(string nickName, string avatarUrl, string userName, string userType, string userTlp)
+        public string UserRegister(string nickName, string avatarUrl, string userName, string userType, string userTlp, string pwd)
         {
-            return dal.UserRegister(nickName, avatarUrl,userName,userType, userTlp);
+            return dal.UserRegister(nickName, avatarUrl,userName,userType, userTlp,pwd);
         }
+
+        public MsgModel UserLogin(string userName, string userpwd)
+        {
+            return dal.UserLogin(userName, userpwd);
+        }
+
         public string GetIPRecord(string mobile, string ShowIp)
         {
             return dal.GetIPRecord(mobile, ShowIp);

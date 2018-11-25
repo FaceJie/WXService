@@ -158,6 +158,7 @@
     <Content Include="Content\images\login\right_hand.png" />
     <Content Include="Content\images\login\tou.png" />
     <Content Include="Content\images\word.png" />
+    <Content Include="Content\images\login\search.png" />
     <Content Include="Content\layui\css\layui.css" />
     <Content Include="Content\layui\css\layui.mobile.css" />
     <Content Include="Content\layui\css\modules\code.css" />
@@ -309,7 +310,6 @@
     <Content Include="Content\resources\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\resources\bootstrap\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\resources\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="Document\aaa.doc" />
     <None Include="Properties\PublishProfiles\ABC.pubxml" />
     <None Include="Properties\PublishProfiles\APPS.pubxml" />
     <None Include="Properties\PublishProfiles\asdf.pubxml" />
@@ -425,12 +425,6 @@
     <Content Include="Scripts\userCss\ViewandDonw.css" />
     <Content Include="Scripts\userJs\jquery-2.0.3.min.js" />
     <Content Include="Scripts\userJs\myFunc.js" />
-    <Content Include="temp\needDemandImgUrl\856f227a474446a09778bc58de8b2c7b.jpg" />
-    <Content Include="temp\needDemandImgUrl\983689d8633b493aa165d12659ab3067.jpg" />
-    <Content Include="temp\needDemandImgUrl\e671f44de570446c9c342f846e49ca19.jpg" />
-    <Content Include="temp\needTableImgUrl\856f227a474446a09778bc58de8b2c7b.png" />
-    <Content Include="temp\needTableImgUrl\983689d8633b493aa165d12659ab3067.png" />
-    <Content Include="temp\needTableImgUrl\e671f44de570446c9c342f846e49ca19.png" />
     <Content Include="Web.config" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
@@ -761,13 +755,7 @@
     <Content Include="Views\FilesUp\Index.cshtml" />
     <Content Include="Views\ErorrOrder\Index.cshtml" />
     <Content Include="Views\PreViewFiles\Index.cshtml" />
-    <Content Include="temp\needDemandUrl\856f227a474446a09778bc58de8b2c7b.doc" />
-    <Content Include="temp\needDemandUrl\983689d8633b493aa165d12659ab3067.doc" />
-    <Content Include="temp\needDemandUrl\e671f44de570446c9c342f846e49ca19.doc" />
-    <Content Include="temp\needTableUrl\856f227a474446a09778bc58de8b2c7b.doc" />
-    <Content Include="temp\needTableUrl\983689d8633b493aa165d12659ab3067.doc" />
-    <None Include="temp\needTableUrl\aaa.pdf" />
-    <Content Include="temp\needTableUrl\vscode-cn-doc.pdf" />
+    <Content Include="Views\PFDLoad\DownIndex.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
