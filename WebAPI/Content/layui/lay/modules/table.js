@@ -430,7 +430,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form'], function(exports){
         ,success: function(res){
           if(res[response.statusName] != response.statusCode){
             that.renderForm();
-            that.layMain.html('<div class="'+ NONE +'">'+ (res[response.msgName] || '返回的数据状态异常') +'</div>');
+            that.layMain.html('<div class="' + NONE + '">' + (res[response.msgName] || '数据为空') + '</div>');
           } else {
             that.renderData(res, curr, res[response.countName]), sort();
             options.time = (new Date().getTime() - that.startTime) + ' ms'; //耗时（接口请求+视图渲染）
@@ -439,7 +439,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form'], function(exports){
           typeof options.done === 'function' && options.done(res, curr, res[response.countName]);
         }
         ,error: function(e, m){
-          that.layMain.html('<div class="'+ NONE +'">数据接口请求异常</div>');
+          that.layMain.html('<div class="'+ NONE +'">数据为空</div>');
           that.renderForm();
           loadIndex && layer.close(loadIndex);
         }

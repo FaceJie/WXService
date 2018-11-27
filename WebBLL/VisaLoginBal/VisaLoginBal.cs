@@ -24,14 +24,14 @@ namespace WebBLL.VisaLoginBal
             return dal.Checking(userName,pwd);
         }
         //2
-        public string UserRegister(string nickName, string avatarUrl, string userName, string userType, string userTlp, string pwd)
+        public string UserRegister(string openid,string nickName, string avatarUrl, string userName, string userType, string userTlp, string pwd)
         {
-            return dal.UserRegister(nickName, avatarUrl,userName,userType, userTlp,pwd);
+            return dal.UserRegister(openid,nickName, avatarUrl,userName,userType, userTlp,pwd);
         }
 
-        public MsgModel UserLogin(string userName, string userpwd)
+        public VisaLoginModel UserLogin(string openid)
         {
-            return dal.UserLogin(userName, userpwd);
+            return dal.UserLogin(openid);
         }
 
         public string GetIPRecord(string mobile, string ShowIp)

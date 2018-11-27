@@ -17,7 +17,7 @@ namespace WebBLL
         {
             return dal.GetAction();
         }
-
+        //表格数据
         public DataTable GetOrderInfo(TableOrgModel tableOrgModel)
         {
             return dal.GetOrderInfo(tableOrgModel);

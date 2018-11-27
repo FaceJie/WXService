@@ -10,6 +10,7 @@ namespace WebModel
     {
         private string userId;
         private string password;
+        private string openid;
         private string userName;
         private string userType;
         private string headUrl;
@@ -17,6 +18,8 @@ namespace WebModel
         private string userNikeName;
         private DateTime entryTime;
         private string bindPhone;
+
+        private string status;
 
         public string UserId
         {
@@ -134,6 +137,32 @@ namespace WebModel
             set
             {
                 password = value;
+            }
+        }
+
+        public string Openid
+        {
+            get
+            {
+                return openid;
+            }
+
+            set
+            {
+                openid = value;
+            }
+        }
+
+        public string Status
+        {
+            get
+            {
+                return status;
+            }
+
+            set
+            {
+                status = value;
             }
         }
     }

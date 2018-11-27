@@ -47,29 +47,43 @@ namespace WebDAL
 
         public DataTable GetOrderInfo(TableOrgModel tableOrgModel)
         {
-            string sql = "SELECT [orderId],[clientName],[clientTlp],[visaInfoCountry],[visaInfoNum],[sendPosition],[recivePosition],[recipientsName],[recipientsTlp],[transportId],[creatOrderTime],[receiveOrderTime],[orderStatus],[recommendedDistance],[recommendedTime],[reallyDistance],[orderReallyTime],[orderCompleteTime],[timeLimit],[discription],[erorrData] FROM [TravelAgency].[dbo].[DataOrder] WHERE 1=1";
+            string sql = "SELECT [transportId],[oName],[oPhone],[sCreateTime],[sName],[sPhone],[sAddress],[rName],[rPhone],[rAddress],[pName],[pPhone],[pSendTime],[lName],[lPhone],[lAddress],[lReceiveTime],[recommendedDistance],[recommendedTime],[recommendedRoute],[reallyDistance],[orderReallyTime],[lCompleteTime],[orderStatus],[erorrData] FROM [TravelAgency].[dbo].[QuickOrder] WHERE 1=1";
             List<SqlParameter> para = new List<SqlParameter>();
             if (!string.IsNullOrEmpty(tableOrgModel.transportId))
             {
                 sql += " and transportId=@transportId ";
                 para.Add(new SqlParameter("@transportId", tableOrgModel.transportId));
             }
-            if (!string.IsNullOrEmpty(tableOrgModel.clientName))
+            if (!string.IsNullOrEmpty(tableOrgModel.sName))
             {
-                sql += " and clientName=@clientName ";
-                para.Add(new SqlParameter("@clientName", tableOrgModel.clientName));
+                sql += " and sName=@sName ";
+                para.Add(new SqlParameter("@sName", tableOrgModel.sName));
             }
-            if (!string.IsNullOrEmpty(tableOrgModel.recipientsName))
+            if (!string.IsNullOrEmpty(tableOrgModel.lName))
             {
-                sql += " and recipientsName=@recipientsName ";
-                para.Add(new SqlParameter("@recipientsName", tableOrgModel.recipientsName));
+                sql += " and lName=@lName ";
+                para.Add(new SqlParameter("@lName", tableOrgModel.lName));
             }
-            if (!string.IsNullOrEmpty(tableOrgModel.country))
+            switch (tableOrgModel.lCompleteTime)
             {
-                para.Add(new SqlParameter("@visaInfoCountry", tableOrgModel.country));
-                sql += " and visaInfoCountry=@visaInfoCountry ";
+                case "1":
+                    sql += " and datediff(day,lCompleteTime,getdate())=0";
+                    break;
+                case "2":
+                    sql += " and  datediff(week,lCompleteTime,getdate())=0";
+                    break;
+                case "3":
+                    sql += " and datediff(month,lCompleteTime,getdate())=0";
+                    break;
+                case "4":
+                    sql += " and datediff(qq,lCompleteTime,getdate())=0";
+                    break;
+                case "5":
+                    break;
+                default:
+                    break;
             }
-            sql += " ORDER BY creatOrderTime DESC";
+            sql += " ORDER BY lCompleteTime DESC";
             return SqlHelper.GetTableTextByParams(sql, para)[0];
         }
 

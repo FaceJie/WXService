@@ -316,6 +316,8 @@
     <None Include="Properties\PublishProfiles\BBB.pubxml" />
     <None Include="Properties\PublishProfiles\CCC.pubxml" />
     <None Include="Properties\PublishProfiles\DDD.pubxml" />
+    <None Include="Properties\PublishProfiles\EEE.pubxml" />
+    <None Include="Properties\PublishProfiles\FFF.pubxml" />
     <None Include="Properties\PublishProfiles\News.pubxml" />
     <None Include="Properties\PublishProfiles\SmartAppApi.pubxml" />
     <None Include="Properties\PublishProfiles\SSS.pubxml" />
@@ -433,6 +435,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Content\WeCharAuth\WeCharAuth.cs" />
     <Compile Include="Content\WXViewModel\userInfoViewModel.cs" />
     <Compile Include="Controllers\Api\DownAndPreviewController.cs" />
     <Compile Include="Controllers\DTService\AdminLoginController.cs" />

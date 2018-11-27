@@ -13,84 +13,91 @@
     <link href="~/Content/userCss/map.css" rel="stylesheet" />
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-1.10.2.js"></script>
+
 </head>
 
 <body>
     <div id="outer-box">
-        <div id="panel">
-            <div class="header_right">
-                <a href="#">
-                    <span class="text">订单监控中心</span>
-                </a>
+        <!--隐藏容器-->
+        <ul class="ulhidden" id="list_first" style="display:none"></ul>
+        <ul class="ulhidden" id="list_second" style="display:none"></ul>
+        <ul class="ulhidden" id="list_third" style="display:none"></ul>
+        <!--订单容器-->
+        <div class="orderList" id="orderList" style="display:none;">
+            <div class="row pre-scrollable" id="list_Container" style="max-height:400px;height:400px;width:100%;margin-left:0;background:#FFFFFF !important;">
+                <ul class="list-group" id="OrderCheckList" style="max-height:320px;height:auto;z-index:9999;margin-left:0;width:100%;"></ul>
+                <div class="header_right" style="width:380px !important;margin-top:0;">
+                    <button type="button" id="upOrderData" class="btn btn-primary active" style="width:100%;background:#009bff;margin:0 auto;color:#000;" onclick="SendOrderList();">派送此订单</button>
+                </div>
             </div>
-            <ul id="accordion" class="accordion" style="max-width:300px;margin-left:0;">
-                <li>
-                    <div class="link" data-index="1"><i class="fa fa-paint-brush"></i>待接单<i class="fa fa-chevron-down"></i></div>
-                    <ul class="submenu" id="list_first"></ul>
-                </li>
-                <li>
-                    <div class="link" data-index="2"><i class="fa fa-code"></i>待处理<i class="fa fa-chevron-down"></i></div>
-                    <ul class="submenu" id="list_second"></ul>
-                </li>
-                <li>
-                    <div class="link" data-index="3"><i class="fa fa-mobile"></i>已完成<i class="fa fa-chevron-down"></i></div>
-                    <ul class="submenu" id="list_third"></ul>
-                </li>
-            </ul>
-            <div class="header_right">
-                <a href="#">
-                    <span class="text">订单派送安排</span>
-                </a>
-            </div>
-            <div class="orderList" style="width:300px;height:auto;margin-top:4px;">
-                <div class="row pre-scrollable" id="list_Container" style="max-height:360px;width:300px;margin-left:0;">
-                    <ul class="list-group" id="OrderCheckList"></ul>
-                    <div class="header_right" style="width:280px !important;">
-                        <button type="button" id="upOrderData" class="btn btn-primary active" style="width:99%;height:100%;background:#fff;margin:0 auto;color:#000;" onclick="SendOrderList();">派送此订单</button>
+        </div>
+        <!--遮罩层-->
+        <section id="mask" class="mask">
+            <div class="mask_in">
+                <!--关闭-->
+                <a href="#" class="close-btn" id="close_btn" onclick="closeMask();"></a>
+
+                <!--内容-->
+                <div class="mask_content">
+                    <div class="mask_header">
+                        <div class="mask_header_title">
+                            <span></span>
+                            <span class="txt">确认派送当前订单</span>
+                            <span></span>
+                        </div>
+                        <form action="" method="post" class="mail-login">
+                            <div class="mail-login-in">
+                                <div class="sendUserInfo" id="sendUserInfo"></div>
+                                <div class="reciveOrderInfo row pre-scrollable" style="max-height:240px;height:220px;" id="reciveOrderInfo">
+
+
+                                </div>
+                            </div>
+                            <a href="#" onclick="CompleteOrderData();" class="btn btn18 r_btn"><span class="text"> 确认</span></a>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="header_right" style="position: fixed;left:0;bottom:55px;">
-                <a href="https://www.iot-esta.com/ErorrOrder/Index">
-                    <span class="text">订单异常处理及审核</span>
-                </a>
-            </div>
-            <div class="header_right" style="position: fixed;left:0;bottom:5px;">
-                <a href="https://www.iot-esta.com/FilesUp/Index">
-                    <span class="text">上传签证资料</span>
-                </a>
+        </section>
+        <!--菜单栏-->
+        <div class="nav-container">
+            <div id="nav">
+                <div id="nav-button-1" class="banner">
+                    订单监控中心
+                    <ul>
+                        <li data-index="1">待处理</li>
+                        <li data-index="2">进行中</li>
+                        <li data-index="3">已完成</li>
+                    </ul>
+                </div>
+                <div id="nav-button-2" class="banner">
+                    订单派送安排
+                    <ul>
+                        <li>派送订单</li>
+                    </ul>
+                </div>
+                <div id="nav-button-3" class="banner">
+                    资料审核和上传
+                    <ul>
+                        <li>
+                            <a href="https://www.iot-esta.com/ErorrOrder/Index"><span class="text">订单异常查询</span></a>
+                        </li>
+                        <li>
+                            <a href="https://www.iot-esta.com/FilesUp/Index"><span class="text">上传所需资料</span></a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+
+        <!--信息窗口-->
         <div id="eventInfo">停留展示信息</div>
+
+        <!--地图控件-->
         <div id="container"></div>
     </div>
-    <section id="mask" class="mask">
-        <div class="mask_in">
-            <!--关闭-->
-            <a href="#" class="close-btn" id="close_btn" onclick="closeMask();"></a>
-
-            <!--内容-->
-            <div class="mask_content">
-                <div class="mask_header">
-                    <div class="mask_header_title">
-                        <span></span>
-                        <span class="txt">确认派送当前订单</span>
-                        <span></span>
-                    </div>
-                    <form action="" method="post" class="mail-login">
-                        <div class="mail-login-in">
-                            <div class="sendUserInfo" id="sendUserInfo"></div>
-                            <div class="reciveOrderInfo row pre-scrollable" style="max-height:240px;height:220px;" id="reciveOrderInfo">
 
 
-                            </div>
-                        </div>
-                        <a href="#" onclick="CompleteOrderData();" class="btn btn18 r_btn"><span class="text"> 确认</span></a>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
     <script src="~/Scripts/jquery-1.10.2.js"></script>
     <script type="text/javascript" src='//webapi.amap.com/maps?v=1.4.10&key=d4cc26f84605e28a992a736913ca2b53'></script>
 
@@ -109,6 +116,7 @@
             creat_time,
             now_time,
             hour,
+            CheckReCordData = new Array(),
             //发送订单相关
             logics = { "userId": "", "userName": "", "position": "" },
             order = [];
@@ -119,26 +127,9 @@
                 zoom: 9
             });
             LoadData();
-            //实例化Accrod
-            var Accordion = function (el, multiple) {
-                this.el = el || {};
-                this.multiple = multiple || false;
-                // 获取li
-                var links = this.el.find('.link');
-                // Evento
-                links.on('click', { el: this.el, multiple: this.multiple }, this.dropdown)
-            }
-            //下拉列表事件定义
-            Accordion.prototype.dropdown = function (e) {
-                var $el = e.data.el;
-                $this = $(this),
-                  $next = $this.next();
-                //$next.slideToggle();
-                //$this.parent().toggleClass('open');
+            //加载列表
+            $('#nav-button-1 ul').on('click', 'li', function (e) {
                 clickIndex = e.target.dataset.index;
-                if (!e.data.multiple) {
-                    //$el.find('.submenu').not($next).slideUp().parent().removeClass('open');
-                };
                 switch (clickIndex) {
                     case "1":
                         mapContainerId = "list_first";
@@ -164,9 +155,15 @@
                 }
                 clearData();
                 CreateMap(mapContainerId, mapData);
-            }
-            //创建手风琴列表
-            var accordion = new Accordion($('#accordion'), false);
+            })
+            $('#nav-button-2 ul').on('click', 'li', function (e) {
+                if ($("#orderList").css("display") == "none") {
+                    $("#orderList").css({ "display": "block" });
+                } else {
+                    $("#orderList").css({ "display": "none" });
+                }
+
+            })
         });
         function clearData() {
             if (markerList != null && markerList.getData().length > 0) {
@@ -264,7 +261,7 @@
                 if (order.length > 0) {
 
                     for (var i = 0; i < order.length; i++) {
-                        chlidList += '<li class="list-group-item" style="width:100%;height:30px;font-size:15px;padding:5px;"><span class="badge">' + order[i].desc + '</span>' + order[i].orderName + '</li>';
+                        chlidList += '<li class="list-group-item" style="max-height:80px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;width:100%;height:30px;font-size:15px;padding:5px;color:#000;"><span class="badge" style="display:inline-black;width:140px;max-height:150px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">' + order[i].desc + '</span>' + order[i].orderName + '</li>';
                     }
                 }
                 $('#reciveOrderInfo').html('<ul class="list-group">' + chlidList + '</ul>');
@@ -313,7 +310,6 @@
                                     //    className = "my-svg-marker-flash"
                                     //    statusDesc = "(急件)";
                                     //}
-                                    debugger
                                     var waitOrderDetail = {
                                         "id": dataJson[i].orderId,
                                         "userName": dataJson[i].sName,
@@ -389,7 +385,7 @@
                                         "type": "1",
                                         "orderName": "客户：" + dataJson[i].sName + "(" + dataJson[i].sPhone + ")",
                                         "orderStatus": dataJson[i].orderStatus,
-                                        "desc":  dataJson[i].sAddress + "*" +  dataJson[i].rAddress 
+                                        "desc": dataJson[i].sAddress + "*" + dataJson[i].rAddress
                                     };
                                     completeOrder.push(completeDetail);
                                     break;
@@ -432,7 +428,7 @@
                         var logicDataDetail = {
                             id: dataJson[i].userId,
                             userName: dataJson[i].userName,
-                            position: [dataJson[i].position.split(",")[0], dataJson[i].position.split(",")[1]],
+                            position: [dataJson[i].position.replace(";", "").split(",")[0], dataJson[i].position.replace(";", "").split(",")[1]],
                             itemColor: "red",
                             className: "my-svg-marker",
                             type: "2",
@@ -574,35 +570,35 @@
 
                       },
                       getInfoWindow: function (dataItem, context, recycledInfoWindow) {
-                          var orderDesc = "";
-                          var str = dataItem.orderStatus == '结束' ? '进行中' : dataItem.orderStatus
-                          if (dataItem.type == "1") {
-                              debugger
-                              orderDesc = "起点：" + dataItem.desc.split('*')[0] + "</br>" + "终点：" + dataItem.desc.split('*')[1] + "</br>" + "订单状态：" + str + "</br>" + "订单号：" + dataItem.transportId
+                          //var orderDesc = "";
+                          //var str = dataItem.orderStatus == '结束' ? '进行中' : dataItem.orderStatus
+                          //if (dataItem.type == "1") {
+                          //    debugger
+                          //    orderDesc = "起点：" + dataItem.desc.split('*')[0] + "</br>" + "终点：" + dataItem.desc.split('*')[1] + "</br>" + "订单状态：" + str + "</br>" + "订单号：" + dataItem.transportId
 
-                          } else {
-                              orderDesc = "位置：" + dataItem.desc
-                          }
-                          if (recycledInfoWindow) {
-                              //存在可回收利用的infoWindow, 直接更新内容返回
-                              recycledInfoWindow.setInfoTitle(dataItem.orderName);
-                              recycledInfoWindow.setInfoBody(orderDesc);
-                              return recycledInfoWindow;
-                          }
-                          //返回一个新的InfoWindow
-                          return new SimpleInfoWindow({
-                              offset: new AMap.Pixel(0, -57),
-                              infoTitle: dataItem.orderName,
-                              infoBody: orderDesc
-                          });
+                          //} else {
+                          //    orderDesc = "位置：" + dataItem.desc
+                          //}
+                          //if (recycledInfoWindow) {
+                          //    //存在可回收利用的infoWindow, 直接更新内容返回
+                          //    recycledInfoWindow.setInfoTitle(dataItem.orderName);
+                          //    recycledInfoWindow.setInfoBody(orderDesc);
+                          //    return recycledInfoWindow;
+                          //}
+                          ////返回一个新的InfoWindow
+                          //return new SimpleInfoWindow({
+                          //    offset: new AMap.Pixel(0, -57),
+                          //    infoTitle: dataItem.orderName,
+                          //    infoBody: orderDesc
+                          //});
                       }
                   });
-
-                  let CheckReCordData=new Array();
+                  debugger
                   markerList.on('listElementClick ' +
                     'markerClick ' +
                     'infoWindowClick',
                     function (event, record) {
+                        debugger
                         var eventType = event.originalEvent.MarkerListEventType;
                         if (eventType == "markerClick") {
                             if (mapContainerId != "list_first") {

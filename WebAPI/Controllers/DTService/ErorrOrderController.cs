@@ -23,7 +23,7 @@ namespace WebAPI.Controllers.DTService
             DataRow[] dr_news=dt.Select("erorrData IS NULL");
             foreach (DataRow dr_new in dr_news)
             {
-                ExcuteErorrData(dr_new);
+                //ExcuteErorrData(dr_new);
             }
 
             return View();
@@ -113,7 +113,7 @@ namespace WebAPI.Controllers.DTService
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     json += ",\"count\":" + dt.Rows.Count;
-                    json += ",\"data\":" + DatatableToJson.Dtb2Json(dt,Convert.ToInt32(page), Convert.ToInt32(limit),0) + "}";
+                    json += ",\"data\":" + DatatableToJson.Dtb2Json(GlobalFuc.GetPagedTable(dt, Convert.ToInt32(page), Convert.ToInt32(limit)))+ "}";
                 }
                 else
                 {
@@ -128,7 +128,7 @@ namespace WebAPI.Controllers.DTService
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     json += ",\"count\":" + dt.Rows.Count;
-                    json += ",\"data\":" + DatatableToJson.Dtb2Json(dt, Convert.ToInt32(page), Convert.ToInt32(limit), 0) + "}";
+                    json += ",\"data\":" + DatatableToJson.Dtb2Json(GlobalFuc.GetPagedTable(dt, Convert.ToInt32(page), Convert.ToInt32(limit))) + "}";
                 }
                 else
                 {

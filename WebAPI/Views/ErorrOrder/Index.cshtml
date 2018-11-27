@@ -30,32 +30,46 @@
 
                     &nbsp; &nbsp;订单号：
                     <div class="layui-inline" style="height:40px;margin-top:8px;">
-                        <input class="layui-input" name="transportId" style="height:30px;">
+                        <input class="layui-input" name="transportId" style="height:30px;width:120px;">
                     </div>
-                    客户姓名：
+                    寄件人：
                     <div class="layui-inline" style="height:40px;margin-top:8px;">
-                        <input class="layui-input" name="clientName" style="height:30px;">
+                        <input class="layui-input" name="sName" style="height:30px;width:120px;">
                     </div>
-                    后勤姓名：
+                    收件人：
                     <div class="layui-inline" style="height:40px;margin-top:8px;">
-                        <input class="layui-input" name="recipientsName" style="height:30px;">
+                        <input class="layui-input" name="rName" style="height:30px;width:120px;">
                     </div>
-                    申请国家：
+                    送件人：
                     <div class="layui-inline" style="height:40px;margin-top:8px;">
-                        <input class="layui-input" name="country" style="height:30px;">
+                        <input class="layui-input" name="lName" style="height:30px;width:120px;">
                     </div>
-                    &nbsp; &nbsp;<button class="layui-btn" onclick="search();"><i class="layui-icon">&#xe615;</i>搜索</button>
+                    时间范围：
+                    <div class="layui-inline" style="height:40px;margin-top:8px;">
+                        <div class="layui-form-item">
+                            <div class="layui-input-inline">
+                                <select id="lCompleteTime" name="lCompleteTime" style="height:30px;width:120px;">
+                                    <option value="1">今天</option>
+                                    <option value="2">本周</option>
+                                    <option value="3">本月</option>
+                                    <option value="4">本季度</option>
+                                    <option value="5" selected="selected">所有</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                   <button class="layui-btn" onclick="search();"><i class="layui-icon">&#xe615;</i>搜索</button>
                 </div>
                 <table class="layui-table" lay-data="{ height:'full-70', url:'/DTService/ErorrOrder/GetOrderInfo', page:true, id:'idTest'}" lay-filter="demo">
                     <thead>
                         <tr>
                             <th lay-data="{field:'transportId',fixed: 'left', width:200,align:'center',}">订单号</th>
-                            <th lay-data="{field:'clientName', width:90,align:'center',}">客户姓名</th>
-                            <th lay-data="{field:'recipientsName', width:90,align:'center',}">后勤姓名</th>
+                            <th lay-data="{field:'oName', align:'center',}">下单人</th>
+                            <th lay-data="{field:'sName',align:'center',}">寄件人</th>
+                            <th lay-data="{field:'rName', align:'center',}">收件人</th>
+                            <th lay-data="{field:'lName', align:'center',}">送件人</th>
                             <th lay-data="{field:'erorrData', width:378,align:'center',edit: 'text',templet:'#erorrData',}">订单分析状况</th>
-                            <th lay-data="{field:'visaInfoCountry', width:90,align:'center',}">申请国家</th>
-                            <th lay-data="{field:'visaInfoNum', width:110,align:'center',}">申请数量(本)</th>
-                            <th lay-data="{field:'orderStatus', width:90,templet: '#orderStatus',align:'center',}">订单状态</th>
+                            <th lay-data="{field:'orderStatus',templet: '#orderStatus',align:'center',}">订单状态</th>
                             <th lay-data="{fixed: 'right', width:170, align:'center',toolbar: '#barDemo',align:'center',}">订单可选操作</th>
 
                         </tr>
@@ -113,25 +127,30 @@
                                 content: '<div class="layui-row">' +
                                                '<div class="layui-col-md12" style="padding: 5px">' +
                                                     '<ul id="flows" class="flow-default">' +
-                                                     '<blockquote class="layui-elem-quote">客户姓名：' + data.clientName + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote" >客户电环：' + data.clientTlp + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">后勤姓名：' + data.recipientsName + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">后勤电话：' + data.recipientsTlp + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote" >客户位置：' + data.sendPosition + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">后勤位置：' + data.recivePosition + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">订单号：' + data.transportId + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">商品名称：' + data.visaInfoCountry + "签证" + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">商品本书：' + data.visaInfoNum + "本" + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote" >客户下单时间：' + ConvertDataTime(data.creatOrderTime) + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">后勤接单时间：' + ConvertDataTime(data.receiveOrderTime) + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">下单人姓名：' + data.oName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >下单人电话：' + data.oPhone + '</blockquote>' +
+                                                      '<blockquote class="layui-elem-quote" >下单时间：' +  ConvertDataTime(data.sCreateTime)+ '</blockquote>' +
+
+                                                     '<blockquote class="layui-elem-quote">寄件人姓名：' + data.sName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">寄件人电话：' + data.sPhone + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">寄件地址：' + data.sAddress + '</blockquote>' +
+
+                                                     '<blockquote class="layui-elem-quote">收件人姓名：' + data.rName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">收件人电话：' + data.rPhone + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote" >收件地址：' + data.rAddress + '</blockquote>' +
+                                                   
+                                                     '<blockquote class="layui-elem-quote">送件人姓名：' + data.lName + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">送件人电话：' + data.lPhone + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">送件人地址：' + data.lAddress + '</blockquote>' +
+
+                                                     '<blockquote class="layui-elem-quote">送件人收件时间：' + ConvertDataTime(data.lReceiveTime) + '</blockquote>' +
                                                      '<blockquote class="layui-elem-quote">订单当前状态：' + data.orderStatus + '</blockquote>' +
                                                      '<blockquote class="layui-elem-quote" >推荐行程距离：' + data.recommendedDistance + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">推荐行程所用时间：' + data.recommendedTime + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">推荐行程时间：' + data.recommendedTime + '</blockquote>' +
                                                      '<blockquote class="layui-elem-quote" >实际行程距离：' + data.reallyDistance + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">实际行程所用时间：' + data.orderReallyTime + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote">接单限制时间：' + data.timeLimit + "小时内" + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote" >推荐收件时间：' + data.discription + '</blockquote>' +
-                                                     '<blockquote class="layui-elem-quote" >收件时间：' + ConvertDataTime(data.orderCompleteTime) + '</blockquote>' +
+                                                     '<blockquote class="layui-elem-quote">实际行程时间：' + data.orderReallyTime + '</blockquote>' +
+
+                                                     '<blockquote class="layui-elem-quote" >完成时间：' + ConvertDataTime(data.lCompleteTime) + '</blockquote>' +
                                                      '<blockquote class="layui-elem-quote" >订单分析状况：' + ConvertErorrData(data.erorrData) + '</blockquote>' +
                                                     '</ul>' +
                                                 '</div>' +
@@ -156,13 +175,15 @@
         }
         function search() {
             var transportId = $("input[name='transportId']").val();
-            var clientName = $("input[name='clientName']").val();
-            var recipientsName = $("input[name='recipientsName']").val();
-            var country = $("input[name='country']").val();
+            var sName = $("input[name='sName']").val();
+            var rName = $("input[name='rName']").val();
+            var lName = $("input[name='lName']").val();
+            var lCompleteTime = $("select[name='lCompleteTime']").val();
             formData["transportId"] = transportId;
-            formData["clientName"] = clientName;
-            formData["recipientsName"] = recipientsName;
-            formData["country"] = country;
+            formData["sName"] = sName;
+            formData["rName"] = rName;
+            formData["lName"] = lName;
+            formData["lCompleteTime"] = lCompleteTime;
             table.reload("idTest", {
                 where: { data: JSON.stringify(formData) }
             });
@@ -277,18 +298,6 @@
                 }
             });
         }
-        /*function LineHight() {
-            LayUIDataTable.SetJqueryObj($);// 第一步：设置jQuery对象
-            var currentRowDataList = LayUIDataTable.ParseDataTable();
-            console.log(currentRowDataList)
-            // 对相关数据进行判断处理--此处对【竞猜数量】大于30的进行高亮显示
-            $.each(currentRowDataList, function (index, obj) {
-                if (obj['erorrData'] && obj['erorrData'].value == "无异常订单") {
-                    obj['erorrData'].row.css("background-color", "#FAB000");
-                }
-            })
-        }*/
-
         function ConvertDataTime(str) {
             if (str==""||str==null) {
                 return "请持续关注订单状况";

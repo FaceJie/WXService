@@ -9,8 +9,9 @@ namespace WebModel
     public class TableOrgModel
     {
         public string transportId { get; set; }
-        public string clientName { get; set; }
-        public string recipientsName { get; set; }
-        public string country { get; set; }
+        public string sName { get; set; }
+        public string rName { get; set; }
+        public string lName { get; set; }
+        public string lCompleteTime { get; set; }
     }
 }
