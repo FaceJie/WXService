@@ -23,7 +23,7 @@ namespace WebAPI.Controllers.DTService
             DataRow[] dr_news=dt.Select("erorrData IS NULL");
             foreach (DataRow dr_new in dr_news)
             {
-                //ExcuteErorrData(dr_new);
+                ExcuteErorrData(dr_new);
             }
 
             return View();
@@ -43,32 +43,19 @@ namespace WebAPI.Controllers.DTService
         public int ExcuteErorrData(DataRow dr)
         {
             
-            if (!string.IsNullOrEmpty(dr["orderCompleteTime"].ToString()))
+            if (!string.IsNullOrEmpty(dr["lCompleteTime"].ToString()))
             {
                 string str_erorr = "";
                 string recommendedDistance = dr["recommendedDistance"].ToString();
                 string reallyDistance = dr["reallyDistance"].ToString();
-                string start= dr["orderReallyTime"].ToString();
-                int end= Convert.ToInt32(dr["timeLimit"].ToString())*60;
+
                 string distanceRex = @"[+-]?\d+[\.]?\d*";
                 double DistanceSpan = Math.Round(double.Parse(Regex.Match(recommendedDistance, distanceRex).Value), 0) - Math.Round(double.Parse(Regex.Match(reallyDistance, distanceRex).Value), 0);
-                //计算时间
-                double TimeSpan = Math.Round(double.Parse(Regex.Match(start, distanceRex).Value), 0) - Math.Round(Convert.ToDouble(end), 0);
                 int erorrIndex = 0;
                 if (DistanceSpan <- 5)
                 {
                     erorrIndex++;
                     str_erorr += "绕路大于5km，";
-                }
-                if (TimeSpan > 60&& TimeSpan <= 180)
-                {
-                    erorrIndex++;
-                    str_erorr += "收件超时1小时，";
-                }
-                if (TimeSpan > 180)
-                {
-                    erorrIndex++;
-                    str_erorr += "故意不结束订单，";
                 }
                 if (erorrIndex == 0)
                 {

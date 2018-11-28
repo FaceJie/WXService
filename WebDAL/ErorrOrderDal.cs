@@ -34,7 +34,7 @@ namespace WebDAL
 
         public int UpErorrData(string transportId, string erorrData)
         {
-            string sql = string.Format("update DataOrder set erorrData='{0}' where transportId='{1}'", erorrData, transportId);
+            string sql = string.Format("update QuickOrder set erorrData='{0}' where transportId='{1}'", erorrData, transportId);
             try
             {
                 return SqlHelper.ExecteNonQueryText(sql, null);
